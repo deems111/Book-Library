@@ -2,6 +2,7 @@ package learn.library.model;
 
 import learn.library.entity.Author;
 import learn.library.entity.Book;
+import learn.library.entity.Comment;
 import learn.library.entity.Genre;
 
 import learn.library.service.interfaces.Library;
@@ -14,7 +15,9 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @ShellComponent
 @Data
@@ -22,9 +25,6 @@ public class ShellModel {
 
     @Autowired
     private Library library;
-
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
 
     /**
      * Method return table, including of all books in library
@@ -53,10 +53,12 @@ public class ShellModel {
      */
     @ShellMethod(value = "Get books by Author", key = "author")
     public String getBooksByAuthor(@ShellOption String surname, String name) {
-        if (Utility.isNotEmpty(surname) || Utility.isNotEmpty(name)) {
-            return convertListToShellString(library.getBooksByAuthor(new Author(-1, -1, surname, name)));
-        }
-        return "Error. Enter Author's name or surname";
+        return convertListToShellString(library.getBooksByAuthor(new Author(null, new Book(), surname, name)));
+    }
+
+    @ShellMethod(value = "Get By Id", key = "id")
+    public String getBookById(@ShellOption long bookId) {
+        return convertBookToShellString(library.getBooksById(bookId));
     }
 
     /**
@@ -100,15 +102,11 @@ public class ShellModel {
             @ShellOption String author,
             @ShellOption String genre) {
 
-        Book book = new Book();
-        book.setName(title);
-        book.setAuthors(convertAuthorsArrayToList(author));
+        Book book = new Book(title, setGenreForAddBook(genre), convertAuthorsArrayToSet(author), null);
 
         if (isBookExist(book)) {
             return "Book already exist";
         }
-
-        book.setGenre(setGenreForAddBook(genre));
 
         long id = library.addBook(book);
         return "Book was added with id = " + id;
@@ -122,8 +120,34 @@ public class ShellModel {
      */
     @ShellMethod(value = "Add genre", key = "addGenre")
     public String addGenre(@ShellOption String genre) {
-        library.addGenre(new Genre(-1, genre));
+        library.addGenre(new Genre(genre));
         return "Genre " + genre + " was added";
+    }
+
+    @ShellMethod(value = "Add comment", key = "addComment")
+    public String addComment(@ShellOption long bookId,
+                             @ShellOption String name,
+                             @ShellOption String subject) {
+        Book book = library.getBooksById(bookId);
+        if (book == null) {
+            return "Book with id = " + bookId + " not found";
+        }
+
+        Comment comment = new Comment(name, subject, book);
+        library.addComment(comment);
+        return "Comment added successfully";
+    }
+
+    @ShellMethod(value = "Delete comment", key = "deleteComment")
+    public String deleteComment(@ShellOption long id) {
+        library.deleteComment(id);
+        return "Comment deleted successfully";
+    }
+
+    @ShellMethod(value = "Delete all comment to book", key = "deleteCommentBook")
+    public String deleteCommentsToBook(@ShellOption long bookId) {
+        library.deleteCommentByBookId(bookId);
+        return "Comment to book with id = " + bookId + " deleted successfully";
     }
 
     /**
@@ -133,30 +157,55 @@ public class ShellModel {
         StringBuilder stringBuilder = new StringBuilder("Books listing");
         if (books.size() > 0) {
             for (Book book : books) {
-                stringBuilder.append("\nTitle: ").append(book.getName()).append("\t");
+                stringBuilder.append("\nTitle: ").append(book.getTitle()).append("\t");
                 stringBuilder.append("Author(s): ");
                 for (Author author : book.getAuthors()) {
                     stringBuilder.append(author.getSurname()).append(" ").append(author.getName()).append(";\t");
                 }
                 stringBuilder.append("Genre: ");
-                stringBuilder.append(book.getGenre().getName() + "\t");
+                stringBuilder.append(book.getGenre().getName()).append("\t");
+
+                if (book.getComments() != null && !book.getComments().isEmpty()) {
+                    stringBuilder.append("\nComments: ");
+                    for (Comment comment : book.getComments()) {
+                        stringBuilder.append("\nAuthor's name: ").append(comment.getName());
+                        stringBuilder.append("\tSubject: ").append(comment.getSubject());
+                    }
+                }
+
             }
         } else {
-            stringBuilder.append("No books found");
+            stringBuilder.append("\nNo books found");
         }
 
+        return stringBuilder.toString();
+    }
+
+    /**
+     * Method convert entity of book into table to show using shell
+     */
+    public static String convertBookToShellString(Book book) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Title: ").append(book.getTitle()).append("\t");
+        stringBuilder.append("Author(s): ");
+        for (Author author : book.getAuthors()) {
+            stringBuilder.append(author.getSurname()).append(" ").append(author.getName()).append(";\t");
+        }
+        stringBuilder.append("Genre: ");
+        stringBuilder.append("Genre: ");
+        stringBuilder.append(book.getGenre().getName() + "\t");
         return stringBuilder.toString();
     }
 
     /***
      * Method convert shell strings with Author's name and surname to object of Author.class
      */
-    public static List<Author> convertAuthorsArrayToList(String authorStr) {
-        List<Author> authors = new ArrayList<>();
+    public static Set<Author> convertAuthorsArrayToSet(String authorStr) {
+        Set<Author> authors = new HashSet<>();
         String[] nameSurname = authorStr.split(";");
         for (String str : nameSurname) {
             String[] author = str.split(",");
-            authors.add(new Author(-1, -1, author[0], author[1]));
+            authors.add(new Author(null, new Book(), author[0], author[1]));
         }
 
         return authors;
@@ -165,13 +214,13 @@ public class ShellModel {
     private Genre setGenreForAddBook(String genre) {
         Genre genreAdd = library.getGenre(genre);
         if (genreAdd == null) {
-            genreAdd = new Genre(library.addGenre(new Genre(-1L, genre)), genre);
+            genreAdd = new Genre(library.addGenre(new Genre(genre)), genre);
         }
         return genreAdd;
     }
 
     private boolean isBookExist(Book addBook) {
-        List<Book> books = library.getBooksByTitle(addBook.getName());
+        List<Book> books = library.getBooksByTitle(addBook.getTitle());
         if (!books.isEmpty()) {
             for (Book book : books) {
                 if (book.equals(addBook)) {

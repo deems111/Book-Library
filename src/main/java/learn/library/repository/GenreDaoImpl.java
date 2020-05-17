@@ -2,52 +2,50 @@ package learn.library.repository;
 
 import learn.library.entity.Genre;
 import learn.library.repository.interfaces.GenreDao;
-import learn.library.repository.interfaces.GenreRowMapper;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 @Repository
 public class GenreDaoImpl implements GenreDao {
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
-
-    //columns with autoincrement values
-    private String[] generatedColumns = {"id"};
+    @PersistenceContext
+    private EntityManager em;
 
     @Override
+    @Transactional
     public long addGenre(Genre genre) {
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update("INSERT INTO GENRE (GENRE) VALUES (:genre)",
-                new MapSqlParameterSource().addValue("genre", genre.getName()),
-                keyHolder, generatedColumns);
-
-
-        return keyHolder.getKey().longValue();
+        em.persist(genre);
+        return getGenre(genre.getName()).getId();
     }
 
     @Override
     public void deleteGenre(long id) {
-        jdbcTemplate.update("DELETE FROM GENRE WHERE ID_GENRE =:idGenre", new MapSqlParameterSource().addValue("idGenre", id));
+        Genre genre = em.find(Genre.class, id);
+        if (genre != null) {
+            em.remove(genre);
+        }
     }
 
+
     /**
-     * When throw 'org.springframework.dao.EmptyResultDataAccessException' exception, return null
+     * When throw 'javax.persistence.NoResultException' exception, return null
      */
     @Override
     public Genre getGenre(String genreName) {
         try {
-            return jdbcTemplate.queryForObject("SELECT * FROM GENRE WHERE GENRE = :genre_name",
-                    new MapSqlParameterSource().addValue("genre_name", genreName),
-                    new GenreRowMapper());
-        } catch (EmptyResultDataAccessException e) {
+            TypedQuery<Genre> query = em.createQuery("SELECT g FROM Genre g WHERE g.name = :genreName",
+                    Genre.class);
+            query.setParameter("genreName", genreName);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
             return null;
         }
+
     }
 
 }

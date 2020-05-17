@@ -4,16 +4,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.Comparator;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Table(name = "AUTHOR")
 public class Author {
 
-    private long id;
-    private long bookId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @JoinColumn(name = "ID_BOOK")
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private Book book;
+
+    @Column
     private String surname;
+
+    @Column
     private String name;
 
     public static class AuthorComparator implements Comparator<Author> {

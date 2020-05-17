@@ -4,81 +4,82 @@ import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.repository.interfaces.AuthorDao;
 import learn.library.repository.interfaces.BookDao;
-import learn.library.repository.interfaces.BookRowMapper;
+import learn.library.repository.interfaces.CommentDao;
 import learn.library.repository.interfaces.GenreDao;
-import learn.library.util.Utility;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Repository
 @AllArgsConstructor
 public class BookDaoImpl implements BookDao {
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    @PersistenceContext
+    private final EntityManager em;
     @Autowired
     private final AuthorDao authorDao;
     @Autowired
-    private final GenreDao genreDao;
+    private final CommentDao commentDao;
 
-    private static final String SELECT_BASE_QUERY = "SELECT b.ID as ID_BOOK, a.ID as ID_AUTHOR, g.ID as ID_GENRE, b.*, a.*, g.* FROM BOOK b " +
-            "LEFT JOIN AUTHOR a ON b.ID = a.ID_BOOK LEFT JOIN GENRE g ON b.ID_GENRE = g.ID WHERE 1=1 ";
-    private static final String SELECT_BY_AUTHOR = "and UPPER(NAME) like :name and UPPER(SURNAME) like :surname";
-    private static final String SELECT_BY_TITLE = "and UPPER (b.TITLE) like :title";
-    private static final String SELECT_BY_ID = "and b.ID = :ID_BOOK";
+    private static final String SELECT_BY_AUTHOR = "SELECT b FROM Book b JOIN b.authors a WHERE UPPER(a.name) like :name and UPPER(a.surname) like :surname";
+    private static final String SELECT_BY_TITLE = "SELECT b FROM Book b WHERE UPPER(b.title) like :title";
 
     @Override
     public List<Book> getBooks() {
-        return jdbcTemplate.query(SELECT_BASE_QUERY, new BookRowMapper());
+        return em.createQuery("SELECT b FROM Book b", Book.class).getResultList();
     }
 
     @Override
     public List<Book> getBooksByAuthor(Author author) {
-        if (Utility.isNotEmpty(author) && Utility.isNotEmpty(author.getId())) {
-            return jdbcTemplate.query(SELECT_BASE_QUERY + SELECT_BY_AUTHOR,
-                    new MapSqlParameterSource().addValue("surname", "%" + author.getSurname().toUpperCase() + "%")
-                            .addValue("name", "%" + author.getName().toUpperCase() + "%"),
-                    new BookRowMapper());
-        }
-        return new ArrayList<Book>();
+        TypedQuery<Book> query = em.createQuery(SELECT_BY_AUTHOR, Book.class);
+        query.setParameter("surname", getLikeString(author.getSurname()));
+        query.setParameter("name", getLikeString(author.getName()));
+        return query.getResultList();
     }
 
     @Override
     public List<Book> getBooksByTitle(String title) {
-        return jdbcTemplate.query(SELECT_BASE_QUERY + SELECT_BY_TITLE,
-                new MapSqlParameterSource().addValue("title", "%" + title.toUpperCase() + "%"),
-                new BookRowMapper());
+        TypedQuery<Book> query = em.createQuery(SELECT_BY_TITLE, Book.class);
+        query.setParameter("title",  getLikeString(title));
+        return query.getResultList();
     }
+
     @Override
+    public Book getBooksById(long id) {
+        return em.find(Book.class, id);
+    }
+
+    @Override
+    @Transactional
     public void deleteBookById(long id) {
-        authorDao.deleteAuthor(id);
-        jdbcTemplate.update("DELETE FROM BOOK WHERE ID =:ID_BOOK", new MapSqlParameterSource().addValue("ID_BOOK", id));
+        Book book = em.find(Book.class, id);
+        if (book != null) {
+            authorDao.deleteAuthor(id);
+            commentDao.deleteCommentsToBook(id);
+            em.remove(book);
+        }
     }
 
     @Override
+    @Transactional
     public long addBook(Book book) {
-        //columns with autoincrement values
-        String[] generatedColumns = {"id"};
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update("INSERT INTO BOOK (TITLE, ID_GENRE) VALUES (:title, :idGenre)",
-                new MapSqlParameterSource().addValue("title", book.getName())
-                        .addValue("idGenre", book.getGenre().getId()),
-                keyHolder, generatedColumns);
-
-        long bookId = keyHolder.getKey().longValue();
-
-        for (Author author : book.getAuthors()) {
-            author.setBookId(bookId);
+        for(Author author : book.getAuthors()) {
+            author.setBook(book);
             authorDao.addAuthor(author);
         }
-        return bookId;
+        em.persist(book);
+        Book addedBook =  em.find(Book.class, book.getId());
+        return addedBook.getId();
+    }
+
+    private String getLikeString (String string) {
+        return "%"+ string.toUpperCase() + "%";
     }
 
 }

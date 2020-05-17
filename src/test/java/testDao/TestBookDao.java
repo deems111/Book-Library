@@ -10,19 +10,20 @@ import learn.library.repository.GenreDaoImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+@DataJpaTest
 @ExtendWith(SpringExtension.class)
 @Import(value = {AuthorDaoImpl.class, GenreDaoImpl.class, BookDaoImpl.class})
 @ContextConfiguration(classes = TestConfig.class)
-@SpringBootTest
 public class TestBookDao {
 
     @Autowired
@@ -32,60 +33,52 @@ public class TestBookDao {
     @Autowired
     private BookDaoImpl bookDao;
 
+    @Autowired
+    private TestEntityManager testEntityManager;
+
     private String TEST_AUTHOR_NAME = "Test_author_name";
     private String TEST_AUTHOR_SURNAME = "Test_author_surname";
-    private long TEST_DEFAULT_AUTHOR_BOOK_ID = -1L;
-    private long TEST_DEFAULT_BOOK_ID = -1L;
     private String TEST_GENRE_NAME = "Test genre name";
     private String TEST_BOOK_TITLE = "Test book title";
 
-    private Author testAuthor = new Author();
-    private Genre testGenre = new Genre();
-    private Book testBook = new Book();
+    private Author author = new Author(null, new Book(), TEST_AUTHOR_SURNAME, TEST_AUTHOR_NAME);
+    private Genre genre = new Genre(TEST_GENRE_NAME);
 
     @Test
     public void addBook() {
-        prepareBook();
-        long bookId = bookDao.addBook(testBook);
+        Book book = new Book(TEST_BOOK_TITLE, setGenre(), setAuthor(), null);
+        for (Author author : book.getAuthors()) {
+            author.setBook(book);
+            testEntityManager.persist(author);
+        }
+        bookDao.addBook(book);
 
-        Assert.isTrue(bookDao.getBooksByAuthor(testAuthor).size() == 1, "Get book by author is null");
+        Assert.isTrue(bookDao.getBooksByAuthor(author).size() == 1, "Get book by author is null");
         Assert.isTrue(bookDao.getBooksByTitle(TEST_BOOK_TITLE).size() == 1, "Get book by title is null");
     }
 
     @Test
     public void deleteBook() {
-        prepareBook();
-        long id = bookDao.addBook(testBook);
+        Book book = new Book(TEST_BOOK_TITLE, setGenre(), setAuthor(), null);
+        for (Author author : book.getAuthors()) {
+            author.setBook(book);
+            testEntityManager.persist(author);
+        }
+        long id = testEntityManager.persist(book).getId();
         bookDao.deleteBookById(id);
 
-        Assert.isTrue(bookDao.getBooksByAuthor(testAuthor).isEmpty(), "Delete book by author is not null");
-        Assert.isTrue(bookDao.getBooksByTitle(TEST_BOOK_TITLE).isEmpty(), "Delete book by title is not null");
+        Assert.isTrue(bookDao.getBooksById(id) == null, "Delete book by author is not null");
     }
 
-    private void setAuthor() {
-        testAuthor.setName(TEST_AUTHOR_NAME);
-        testAuthor.setSurname(TEST_AUTHOR_SURNAME);
-        testAuthor.setBookId(TEST_DEFAULT_AUTHOR_BOOK_ID);
+    private Set<Author> setAuthor() {
+        Set<Author> authors = new HashSet<>();
+        authors.add(author);
+        return authors;
     }
 
-    private void setBook() {
-        List<Author> authors = new ArrayList<>();
-        authors.add(testAuthor);
-        testBook.setAuthors(authors);
-        testBook.setGenre(testGenre);
-        testBook.setName(TEST_BOOK_TITLE);
-        testBook.setId(TEST_DEFAULT_BOOK_ID);
-    }
-
-    private void prepareBook() {
-        if (genreDao.getGenre(TEST_GENRE_NAME) == null) {
-            testGenre.setName(TEST_GENRE_NAME);
-            testGenre.setId(genreDao.addGenre(testGenre));
-        } else {
-            testGenre = genreDao.getGenre(TEST_GENRE_NAME);
-        }
-        setAuthor();
-        setBook();
+    private Genre setGenre() {
+        testEntityManager.persist(genre);
+        return genre;
     }
 
 }

@@ -1,0 +1,5 @@
+datasource:
+  url: jdbc:h2:mem:testdb
+  username: sa
+  password:
+  initialization-mode: always

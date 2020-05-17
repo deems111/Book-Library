@@ -1,44 +1,35 @@
 package learn.library.repository;
 
 import learn.library.entity.Author;
-
-import learn.library.entity.Genre;
 import learn.library.repository.interfaces.AuthorDao;
-import learn.library.repository.interfaces.AuthorRowMapper;
-import learn.library.repository.interfaces.GenreRowMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.util.List;
 
 @Repository
+@AllArgsConstructor
 public class AuthorDaoImpl implements AuthorDao {
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
-
-    //columns with autoincrement values
-    private String[] generatedColumns = {"id"};
+    @PersistenceContext
+    private final EntityManager em;
 
     @Override
+    @Transactional
     public long addAuthor(Author author) {
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update("INSERT INTO AUTHOR (SURNAME, NAME, ID_BOOK) VALUES (:surname, :name, :idBook)",
-                new MapSqlParameterSource().addValue("surname", author.getSurname())
-                        .addValue("name", author.getName())
-                        .addValue("idBook", author.getBookId()),
-                keyHolder, generatedColumns);
-
-        return keyHolder.getKey().longValue();
+        em.persist(author);
+        return getAuthor(author).getId();
     }
 
     @Override
     public void deleteAuthor(long bookId) {
-        jdbcTemplate.update("DELETE FROM AUTHOR WHERE ID_BOOK =:ID_BOOK",
-                new MapSqlParameterSource().addValue("ID_BOOK", bookId));
+        for (Author author : getAuthorsByBookId(bookId)) {
+            em.remove(author);
+        }
     }
 
     /**
@@ -46,14 +37,20 @@ public class AuthorDaoImpl implements AuthorDao {
      */
     @Override
     public Author getAuthor(Author author) {
-        try {
-            return jdbcTemplate.queryForObject("SELECT * FROM AUTHOR WHERE NAME = :name AND SURNAME = :surname",
-                    new MapSqlParameterSource().addValue("name", author.getName())
-                            .addValue("surname", author.getSurname()),
-                    new AuthorRowMapper());
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
+        TypedQuery<Author> query = em.createQuery("SELECT a FROM Author a JOIN a.book b WHERE a.surname = :surname AND a.name = :name AND b.id = :bookId",
+                Author.class);
+        query.setParameter("surname", author.getSurname());
+        query.setParameter("name", author.getName());
+        query.setParameter("bookId", author.getBook().getId());
+        return query.getSingleResult();
+    }
+
+    @Override
+    public List<Author> getAuthorsByBookId(long bookId) {
+        TypedQuery<Author> query = em.createQuery("SELECT a FROM Author a JOIN a.book b WHERE b.id = :bookId",
+                Author.class);
+        query.setParameter("bookId", bookId);
+        return query.getResultList();
     }
 
 }

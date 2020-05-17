@@ -13,7 +13,10 @@ public interface BookDao {
 
     List<Book> getBooksByTitle(String title);
 
+    Book getBooksById(long id);
+
     void deleteBookById(long id);
 
     long addBook(Book book);
+
 }
