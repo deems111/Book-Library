@@ -31,19 +31,14 @@ public class Book {
             return false;
         }
 
-        Author.AuthorComparator comparator = new Author.AuthorComparator();
         List<Author> authors = getAuthors();
         List<Author> anotherAuthors = book.getAuthors();
-        authors.sort(comparator);
-        anotherAuthors.sort(comparator);
-
         return listEquals(authors, anotherAuthors);
     }
 
     private boolean listEquals(List<Author> authors, List<Author> anotherAuthors) {
         for (int i = 0; i < authors.size(); i++) {
-            if (!authors.get(i).getSurname().equalsIgnoreCase(anotherAuthors.get(i).getSurname())
-                    || !authors.get(i).getName().equalsIgnoreCase(anotherAuthors.get(i).getName())) {
+            if (!authors.get(i).equals(anotherAuthors.get(i))) {
                 return false;
             }
         }

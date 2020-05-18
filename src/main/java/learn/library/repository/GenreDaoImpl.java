@@ -33,7 +33,7 @@ public class GenreDaoImpl implements GenreDao {
 
     @Override
     public void deleteGenre(long id) {
-        jdbcTemplate.update("DELETE FROM GENRE WHERE ID_GENRE =:idGenre", new MapSqlParameterSource().addValue("idGenre", id));
+        jdbcTemplate.update("DELETE FROM GENRE WHERE ID =:idGenre", new MapSqlParameterSource().addValue("idGenre", id));
     }
 
     /**

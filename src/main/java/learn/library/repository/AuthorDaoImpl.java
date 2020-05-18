@@ -25,31 +25,35 @@ public class AuthorDaoImpl implements AuthorDao {
 
     @Override
     public long addAuthor(Author author) {
+        Author existingAuthor =getAuthor(author.getSurname(), author.getName());
+        if (existingAuthor != null) {
+            return existingAuthor.getId();
+        }
+
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update("INSERT INTO AUTHOR (SURNAME, NAME, ID_BOOK) VALUES (:surname, :name, :idBook)",
+        jdbcTemplate.update("INSERT INTO AUTHOR (SURNAME, NAME) VALUES (:surname, :name)",
                 new MapSqlParameterSource().addValue("surname", author.getSurname())
-                        .addValue("name", author.getName())
-                        .addValue("idBook", author.getBookId()),
+                        .addValue("name", author.getName()),
                 keyHolder, generatedColumns);
 
         return keyHolder.getKey().longValue();
     }
 
     @Override
-    public void deleteAuthor(long bookId) {
-        jdbcTemplate.update("DELETE FROM AUTHOR WHERE ID_BOOK =:ID_BOOK",
-                new MapSqlParameterSource().addValue("ID_BOOK", bookId));
+    public void deleteAuthor(long id) {
+        jdbcTemplate.update("DELETE FROM AUTHOR WHERE ID =:ID",
+                new MapSqlParameterSource().addValue("ID", id));
     }
 
     /**
      * When throw 'org.springframework.dao.EmptyResultDataAccessException' exception, return null
      */
     @Override
-    public Author getAuthor(Author author) {
+    public Author getAuthor(String surname, String name) {
         try {
             return jdbcTemplate.queryForObject("SELECT * FROM AUTHOR WHERE NAME = :name AND SURNAME = :surname",
-                    new MapSqlParameterSource().addValue("name", author.getName())
-                            .addValue("surname", author.getSurname()),
+                    new MapSqlParameterSource().addValue("name", name)
+                            .addValue("surname", surname),
                     new AuthorRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Comparator;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -12,27 +13,26 @@ import java.util.Comparator;
 public class Author {
 
     private long id;
-    private long bookId;
+    private List<Book> books;
     private String surname;
     private String name;
 
-    public static class AuthorComparator implements Comparator<Author> {
-
-        @Override
-        public int compare(Author author, Author anotherAuthor) {
-            if (!author.getSurname().equalsIgnoreCase(anotherAuthor.getSurname())) {
-                return compareSurname(author.getSurname(), anotherAuthor.getSurname());
-            } else return compareName(author.getName(), anotherAuthor.getName());
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
         }
-
-        private int compareSurname(String surname, String anotherSurname) {
-            return surname.compareTo(anotherSurname);
+        if (object == null || getClass() != object.getClass()) {
+            return false;
         }
+        Author author = (Author) object;
+        return getName() != null ? getName().equalsIgnoreCase(author.getName()) : author.getName() == null &&
+                getSurname() != null ? getSurname().equalsIgnoreCase(author.getSurname()) : author.getSurname() == null;
+    }
 
-        private int compareName(String name, String anotherName) {
-            return name.compareTo(anotherName);
-        }
-
+    @Override
+    public int hashCode() {
+        return 99 * ((getName() != null ? getName().hashCode() : 0) + (getSurname() != null ? getSurname().hashCode() : 0));
     }
 
 }

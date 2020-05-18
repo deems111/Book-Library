@@ -6,8 +6,8 @@ public interface AuthorDao {
 
     long addAuthor(Author author);
 
-    void deleteAuthor(long bookId);
+    void deleteAuthor(long id);
 
-    Author getAuthor(Author author);
+    Author getAuthor(String surname, String name);
 
 }

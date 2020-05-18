@@ -8,7 +8,6 @@ import learn.library.service.interfaces.Library;
 import learn.library.util.Utility;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -22,9 +21,6 @@ public class ShellModel {
 
     @Autowired
     private Library library;
-
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
 
     /**
      * Method return table, including of all books in library
@@ -54,7 +50,7 @@ public class ShellModel {
     @ShellMethod(value = "Get books by Author", key = "author")
     public String getBooksByAuthor(@ShellOption String surname, String name) {
         if (Utility.isNotEmpty(surname) || Utility.isNotEmpty(name)) {
-            return convertListToShellString(library.getBooksByAuthor(new Author(-1, -1, surname, name)));
+            return convertListToShellString(library.getBooksByAuthor(surname, name));
         }
         return "Error. Enter Author's name or surname";
     }
@@ -79,7 +75,7 @@ public class ShellModel {
      */
     @ShellMethod(value = "Delete genre", key = "deleteGenre")
     public String deleteGenre(@ShellOption Long id) {
-        library.deleteBookById(id);
+        library.deleteGenre(id);
         return "Genre with id " + id + " was deleted";
     }
 
@@ -117,13 +113,15 @@ public class ShellModel {
     /**
      * Add genre to library
      *
-     * @param genre title of genre
+     * @param genreStr title of genre
      * @return String
      */
     @ShellMethod(value = "Add genre", key = "addGenre")
-    public String addGenre(@ShellOption String genre) {
-        library.addGenre(new Genre(-1, genre));
-        return "Genre " + genre + " was added";
+    public String addGenre(@ShellOption String genreStr) {
+        Genre genre = new Genre();
+        genre.setName(genreStr);
+        library.addGenre(genre);
+        return "Genre " + genreStr + " was added";
     }
 
     /**
@@ -139,7 +137,7 @@ public class ShellModel {
                     stringBuilder.append(author.getSurname()).append(" ").append(author.getName()).append(";\t");
                 }
                 stringBuilder.append("Genre: ");
-                stringBuilder.append(book.getGenre().getName() + "\t");
+                stringBuilder.append(book.getGenre().getName()).append("\t");
             }
         } else {
             stringBuilder.append("No books found");
@@ -155,8 +153,11 @@ public class ShellModel {
         List<Author> authors = new ArrayList<>();
         String[] nameSurname = authorStr.split(";");
         for (String str : nameSurname) {
-            String[] author = str.split(",");
-            authors.add(new Author(-1, -1, author[0], author[1]));
+            String[] authorArrayString = str.split(",");
+            Author author = new Author();
+            author.setSurname(authorArrayString[0]);
+            author.setName(authorArrayString[1]);
+            authors.add(author);
         }
 
         return authors;

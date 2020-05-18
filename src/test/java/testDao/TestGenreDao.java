@@ -2,17 +2,21 @@ package testDao;
 
 import configuration.TestConfig;
 import learn.library.entity.Genre;
+import learn.library.repository.AuthorDaoImpl;
 import learn.library.repository.GenreDaoImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.Assert;
 
-@ExtendWith(SpringExtension.class)
+@JdbcTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({GenreDaoImpl.class})
 @ContextConfiguration(classes = TestConfig.class)
 public class TestGenreDao {
@@ -23,7 +27,7 @@ public class TestGenreDao {
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
 
-    private String TEST_GENRE_NAME = "Test genre name";
+    private static final String TEST_GENRE_NAME = "Test genre name";
     private Genre testGenre = new Genre();
 
     @Test
@@ -37,7 +41,8 @@ public class TestGenreDao {
     @Test
     public void deleteGenre() {
         testGenre.setName(TEST_GENRE_NAME);
-        genreDao.deleteGenre(genreDao.getGenre(TEST_GENRE_NAME).getId());
+        long genreId = genreDao.addGenre(testGenre);
+        genreDao.deleteGenre(genreId);
 
         Assert.isNull(genreDao.getGenre(TEST_GENRE_NAME), "Genre delete is not OK");
     }

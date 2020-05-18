@@ -10,6 +10,8 @@ import learn.library.repository.GenreDaoImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,10 +21,10 @@ import org.springframework.util.Assert;
 import java.util.ArrayList;
 import java.util.List;
 
-@ExtendWith(SpringExtension.class)
-@Import(value = {AuthorDaoImpl.class, GenreDaoImpl.class, BookDaoImpl.class})
+@JdbcTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({AuthorDaoImpl.class, GenreDaoImpl.class, BookDaoImpl.class})
 @ContextConfiguration(classes = TestConfig.class)
-@SpringBootTest
 public class TestBookDao {
 
     @Autowired
@@ -32,12 +34,12 @@ public class TestBookDao {
     @Autowired
     private BookDaoImpl bookDao;
 
-    private String TEST_AUTHOR_NAME = "Test_author_name";
-    private String TEST_AUTHOR_SURNAME = "Test_author_surname";
-    private long TEST_DEFAULT_AUTHOR_BOOK_ID = -1L;
-    private long TEST_DEFAULT_BOOK_ID = -1L;
-    private String TEST_GENRE_NAME = "Test genre name";
-    private String TEST_BOOK_TITLE = "Test book title";
+    private static final String TEST_AUTHOR_NAME = "Test_author_name";
+    private static final String TEST_AUTHOR_SURNAME = "Test_author_surname";
+    private static final long TEST_DEFAULT_AUTHOR_BOOK_ID = -1L;
+    private static final long TEST_DEFAULT_BOOK_ID = -1L;
+    private static final String TEST_GENRE_NAME = "Test genre name";
+    private static final String TEST_BOOK_TITLE = "Test book title";
 
     private Author testAuthor = new Author();
     private Genre testGenre = new Genre();
@@ -65,7 +67,6 @@ public class TestBookDao {
     private void setAuthor() {
         testAuthor.setName(TEST_AUTHOR_NAME);
         testAuthor.setSurname(TEST_AUTHOR_SURNAME);
-        testAuthor.setBookId(TEST_DEFAULT_AUTHOR_BOOK_ID);
     }
 
     private void setBook() {

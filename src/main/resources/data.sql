@@ -1,15 +1,20 @@
 INSERT INTO GENRE (GENRE) VALUES ('first genre');
 INSERT INTO GENRE (GENRE) VALUES ('second genre');
-INSERT INTO GENRE (GENRE) VALUES ('Third genre');
-INSERT INTO GENRE (GENRE) VALUES ('4');
+INSERT INTO GENRE (GENRE) VALUES ('third genre');
+INSERT INTO GENRE (GENRE) VALUES ('forth genre');
 
 INSERT INTO BOOK (ID_GENRE, TITLE) VALUES (1, 'First book title');
 INSERT INTO BOOK (ID_GENRE, TITLE) VALUES (2, 'Second book title');
 INSERT INTO BOOK (ID_GENRE, TITLE) VALUES (1, 'Third book title');
 
-INSERT INTO AUTHOR (ID_BOOK, SURNAME, NAME) VALUES (1, 'FirstBookAuthorSurname', 'FirstBookAuthorName');
-INSERT INTO AUTHOR (ID_BOOK, SURNAME, NAME) VALUES (1, 'FirstBookSecondAuthorSurname', 'FirstBookSecondAuthorName');
-INSERT INTO AUTHOR (ID_BOOK, SURNAME, NAME) VALUES (2, 'SecondBookAuthorSurname', 'SecondBookAuthorName');
-INSERT INTO AUTHOR (ID_BOOK, SURNAME, NAME) VALUES (3, 'ThirdBookAuthorSurname', 'ThirdBookAuthorName');
+INSERT INTO AUTHOR (SURNAME, NAME) VALUES ('FirstBookAuthorSurname', 'FirstBookAuthorName');
+INSERT INTO AUTHOR (SURNAME, NAME) VALUES ('FirstBookSecondAuthorSurname', 'FirstBookSecondAuthorName');
+INSERT INTO AUTHOR (SURNAME, NAME) VALUES ('SecondBookAuthorSurname', 'SecondBookAuthorName');
+INSERT INTO AUTHOR (SURNAME, NAME) VALUES ('ThirdBookAuthorSurname', 'ThirdBookAuthorName');
 
-commit;
+INSERT INTO BOOK_AUTHOR (ID_BOOK, ID_AUTHOR) VALUES (1, 1);
+INSERT INTO BOOK_AUTHOR (ID_BOOK, ID_AUTHOR) VALUES (1, 2);
+INSERT INTO BOOK_AUTHOR (ID_BOOK, ID_AUTHOR) VALUES (2, 3);
+INSERT INTO BOOK_AUTHOR (ID_BOOK, ID_AUTHOR) VALUES (3, 4);
+
+COMMIT;

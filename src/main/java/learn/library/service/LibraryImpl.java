@@ -32,7 +32,8 @@ public class LibraryImpl implements Library {
     }
 
     @Override
-    public List<Book> getBooksByAuthor(Author author) {
+    public List<Book> getBooksByAuthor(String surname, String name) {
+        Author author = authorDao.getAuthor(surname, name);
         return bookDao.getBooksByAuthor(author);
     }
 
@@ -54,6 +55,11 @@ public class LibraryImpl implements Library {
     @Override
     public long addGenre(Genre genre) {
         return genreDao.addGenre(genre);
+    }
+
+    @Override
+    public void deleteGenre(long id) {
+        genreDao.deleteGenre(id);
     }
 
     public Genre getGenre(String genre) {

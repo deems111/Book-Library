@@ -13,13 +13,15 @@ public interface Library {
 
     List<Book> getBooks();
 
-    List<Book> getBooksByAuthor(Author author);
+    List<Book> getBooksByAuthor(String surname, String name);
 
     List<Book> getBooksByTitle(String title);
 
     void deleteBookById(long id);
 
     long addGenre(Genre genre);
+
+    void deleteGenre(long id);
 
     long addBook(Book book);
 

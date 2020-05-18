@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookRowMapper implements ResultSetExtractor<List<Book>> {
+public class BookResultSetExtractor implements ResultSetExtractor<List<Book>> {
 
     @Override
     public List<Book> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -37,12 +37,20 @@ public class BookRowMapper implements ResultSetExtractor<List<Book>> {
                 book.setId(rs.getLong("ID_BOOK"));
                 book.setName(rs.getString("TITLE"));
                 book.setGenre(new Genre(rs.getLong("ID_GENRE"), rs.getString("GENRE")));
-                authors.add(new Author(rs.getLong("ID_AUTHOR"), rs.getLong("ID_BOOK"), rs.getString("SURNAME"), rs.getString("NAME")));
-                previousBookId = rs.getLong("ID_BOOK");
+                Author author = new Author();
+                    author.setId(rs.getLong("ID_AUTHOR"));
+                    author.setSurname(rs.getString("SURNAME"));
+                    author.setName(rs.getString("NAME"));
+                    authors.add(author);
+                    previousBookId = rs.getLong("ID_BOOK");
 
             } else {
                 if (Utility.isNotEmpty(rs.getLong("ID_AUTHOR"))) {
-                    authors.add(new Author(rs.getLong("ID_AUTHOR"), rs.getLong("ID_BOOK"), rs.getString("SURNAME"), rs.getString("NAME")));
+                    Author author = new Author();
+                    author.setId(rs.getLong("ID_AUTHOR"));
+                    author.setSurname(rs.getString("SURNAME"));
+                    author.setName(rs.getString("NAME"));
+                    authors.add(author);
                 }
             }
         }
