@@ -16,15 +16,18 @@ import java.util.List;
 
 @Service
 @Data
-@AllArgsConstructor
 public class LibraryImpl implements Library {
 
+    private final BookDao bookDao;
+    private final AuthorDao authorDao;
+    private final GenreDao genreDao;
+
     @Autowired
-    private BookDao bookDao;
-    @Autowired
-    private AuthorDao authorDao;
-    @Autowired
-    private GenreDao genreDao;
+    public LibraryImpl(BookDao bookDao, AuthorDao authorDao, GenreDao genreDao) {
+        this.bookDao = bookDao;
+        this.authorDao = authorDao;
+        this.genreDao = genreDao;
+    }
 
     @Override
     public List<Book> getBooks() {

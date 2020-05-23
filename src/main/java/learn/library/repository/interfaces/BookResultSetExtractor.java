@@ -10,56 +10,45 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BookResultSetExtractor implements ResultSetExtractor<List<Book>> {
 
+    Map<Long, Book> booksMap = new HashMap<>();
+
     @Override
     public List<Book> extractData(ResultSet rs) throws SQLException, DataAccessException {
-        List<Book> books = new ArrayList<>();
-        List<Author> authors = new ArrayList<>();
-
-        long previousBookId = -1L;
-        Book book = new Book();
-        boolean firstResult = true;
-        boolean rsHasBook = false;
-
+        List<Author> authors;
         while (rs.next()) {
-            if (previousBookId != rs.getLong("ID_BOOK")) {
-                if (!firstResult) {
-                    book.setAuthors(authors);
-                    books.add(book);
-                    book = new Book();
-                    authors = new ArrayList<>();
-                }
-                firstResult = false;
-                rsHasBook = true;
+            Long id = rs.getLong("ID_BOOK");
+            Book book = booksMap.get(id);
+            if (book != null) {
+                authors = book.getAuthors();
+                extractAuthorData(rs, authors, book);
+            } else {
+                book = new Book();
                 book.setId(rs.getLong("ID_BOOK"));
                 book.setName(rs.getString("TITLE"));
                 book.setGenre(new Genre(rs.getLong("ID_GENRE"), rs.getString("GENRE")));
-                Author author = new Author();
-                    author.setId(rs.getLong("ID_AUTHOR"));
-                    author.setSurname(rs.getString("SURNAME"));
-                    author.setName(rs.getString("NAME"));
-                    authors.add(author);
-                    previousBookId = rs.getLong("ID_BOOK");
-
-            } else {
-                if (Utility.isNotEmpty(rs.getLong("ID_AUTHOR"))) {
-                    Author author = new Author();
-                    author.setId(rs.getLong("ID_AUTHOR"));
-                    author.setSurname(rs.getString("SURNAME"));
-                    author.setName(rs.getString("NAME"));
-                    authors.add(author);
-                }
+                authors = new ArrayList<>();
+                extractAuthorData(rs, authors, book);
+                booksMap.put(id, book);
             }
         }
-        if (rsHasBook) {
-            book.setAuthors(authors);
-            books.add(book);
-        }
+        return new ArrayList<>(booksMap.values());
+    }
 
-        return books;
+    private void extractAuthorData(ResultSet rs, List<Author> authors, Book book) throws SQLException, DataAccessException {
+        if (Utility.isNotEmpty(rs.getLong("ID_AUTHOR"))) {
+            Author author = new Author();
+            author.setId(rs.getLong("ID_AUTHOR"));
+            author.setSurname(rs.getString("SURNAME"));
+            author.setName(rs.getString("NAME"));
+            authors.add(author);
+        }
+        book.setAuthors(authors);
     }
 
 }

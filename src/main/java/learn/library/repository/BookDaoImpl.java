@@ -6,9 +6,9 @@ import learn.library.repository.interfaces.AuthorDao;
 import learn.library.repository.interfaces.BookDao;
 import learn.library.repository.interfaces.BookResultSetExtractor;
 import learn.library.util.Utility;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
@@ -17,13 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@AllArgsConstructor
 public class BookDaoImpl implements BookDao {
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
-    @Autowired
+    private final NamedParameterJdbcOperations jdbcTemplate;
     private final AuthorDao authorDao;
+
+    @Autowired
+    public BookDaoImpl(NamedParameterJdbcTemplate jdbcTemplate, AuthorDao authorDao) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.authorDao = authorDao;
+    }
 
     private static final String SELECT_BASE_QUERY = "SELECT b.ID as ID_BOOK, a.ID as ID_AUTHOR, g.ID as ID_GENRE, b.*, a.*, g.* " +
             "FROM BOOK b LEFT JOIN BOOK_AUTHOR ba ON b.id = ba.ID_BOOK LEFT JOIN AUTHOR a ON ba.ID_AUTHOR = a.ID LEFT JOIN GENRE g ON b.ID_GENRE = g.ID WHERE 1=1 ";
@@ -61,13 +64,11 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public long addBook(Book book) {
-        //columns with autoincrement values
-        String[] generatedColumns = {"id"};
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update("INSERT INTO BOOK (TITLE, ID_GENRE) VALUES (:title, :idGenre)",
                 new MapSqlParameterSource().addValue("title", book.getName())
                         .addValue("idGenre", book.getGenre().getId()),
-                keyHolder, generatedColumns);
+                keyHolder, new String[] {"id"});
 
         long bookId = keyHolder.getKey().longValue();
 

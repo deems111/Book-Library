@@ -19,8 +19,12 @@ import java.util.List;
 @Data
 public class ShellModel {
 
+    private final Library library;
+
     @Autowired
-    private Library library;
+    public ShellModel(Library library) {
+        this.library = library;
+    }
 
     /**
      * Method return table, including of all books in library

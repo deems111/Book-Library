@@ -1,22 +1,15 @@
-package testDao;
+package learn.library.repository;
 
-import configuration.TestConfig;
-import learn.library.Main;
 import learn.library.entity.Author;
-import learn.library.repository.AuthorDaoImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.Assert;
 
 @JdbcTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({AuthorDaoImpl.class})
-@ContextConfiguration(classes = TestConfig.class)
-public class TestAuthorDao {
+class AuthorDaoImplTest {
 
     @Autowired
     private AuthorDaoImpl authorDao;
@@ -47,5 +40,6 @@ public class TestAuthorDao {
 
         Assert.isTrue(authorDao.getAuthor(TEST_AUTHOR_SURNAME, TEST_AUTHOR_NAME) == null, "Deleted author is not null");
     }
+
 
 }

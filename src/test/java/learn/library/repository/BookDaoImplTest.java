@@ -1,31 +1,22 @@
-package testDao;
+package learn.library.repository;
 
-import configuration.TestConfig;
 import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.entity.Genre;
-import learn.library.repository.AuthorDaoImpl;
-import learn.library.repository.BookDaoImpl;
-import learn.library.repository.GenreDaoImpl;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @JdbcTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({AuthorDaoImpl.class, GenreDaoImpl.class, BookDaoImpl.class})
-@ContextConfiguration(classes = TestConfig.class)
-public class TestBookDao {
+@Import({GenreDaoImpl.class, AuthorDaoImpl.class, BookDaoImpl.class})
+class BookDaoImplTest {
 
     @Autowired
     private AuthorDaoImpl authorDao;
@@ -88,5 +79,6 @@ public class TestBookDao {
         setAuthor();
         setBook();
     }
+
 
 }
