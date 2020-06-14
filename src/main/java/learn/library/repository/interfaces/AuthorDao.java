@@ -2,7 +2,7 @@ package learn.library.repository.interfaces;
 
 import learn.library.entity.Author;
 
-import java.util.List;
+import java.util.Set;
 
 public interface AuthorDao {
 
@@ -10,7 +10,7 @@ public interface AuthorDao {
 
     Author getAuthor(Author author);
 
-    List<Author> getAuthorsByBookId(long bookId);
+    Set<Author> getAuthorsByBookId(long bookId);
 
     void deleteAuthor(long bookId);
 

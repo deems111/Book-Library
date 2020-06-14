@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -27,7 +28,7 @@ public class BookDaoImpl implements BookDao {
     @Autowired
     private final CommentDao commentDao;
 
-    private static final String SELECT_BY_AUTHOR = "SELECT b FROM Book b JOIN b.authors a WHERE UPPER(a.name) like :name and UPPER(a.surname) like :surname";
+    private static final String SELECT_BY_AUTHOR = "SELECT distinct b FROM Book b JOIN b.authors a WHERE a.id = :id";
     private static final String SELECT_BY_TITLE = "SELECT b FROM Book b WHERE UPPER(b.title) like :title";
 
     @Override
@@ -37,9 +38,13 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public List<Book> getBooksByAuthor(Author author) {
+        Author authorFromDb = authorDao.getAuthor(author);
+        if (authorFromDb == null) {
+            return new ArrayList<>();
+        }
+
         TypedQuery<Book> query = em.createQuery(SELECT_BY_AUTHOR, Book.class);
-        query.setParameter("surname", getLikeString(author.getSurname()));
-        query.setParameter("name", getLikeString(author.getName()));
+        query.setParameter("id", authorFromDb.getId());
         return query.getResultList();
     }
 
@@ -60,7 +65,7 @@ public class BookDaoImpl implements BookDao {
     public void deleteBookById(long id) {
         Book book = em.find(Book.class, id);
         if (book != null) {
-            authorDao.deleteAuthor(id);
+     //       authorDao.deleteAuthor(id);
             commentDao.deleteCommentsToBook(id);
             em.remove(book);
         }
@@ -70,8 +75,10 @@ public class BookDaoImpl implements BookDao {
     @Transactional
     public long addBook(Book book) {
         for(Author author : book.getAuthors()) {
-            author.setBook(book);
-            authorDao.addAuthor(author);
+            Author authorFromDb = authorDao.getAuthor(author);
+            if(authorFromDb == null) {
+                authorDao.addAuthor(author);
+            }
         }
         em.persist(book);
         Book addedBook =  em.find(Book.class, book.getId());

@@ -34,6 +34,9 @@ public interface Library {
 
     void deleteCommentByBookId(long bookId);
 
+    List<Comment> getCommentsByBookId(long bookId);
+
+
 }
 
 

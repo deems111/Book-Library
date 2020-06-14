@@ -7,9 +7,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Repository
 @AllArgsConstructor
@@ -37,20 +39,23 @@ public class AuthorDaoImpl implements AuthorDao {
      */
     @Override
     public Author getAuthor(Author author) {
-        TypedQuery<Author> query = em.createQuery("SELECT a FROM Author a JOIN a.book b WHERE a.surname = :surname AND a.name = :name AND b.id = :bookId",
-                Author.class);
-        query.setParameter("surname", author.getSurname());
-        query.setParameter("name", author.getName());
-        query.setParameter("bookId", author.getBook().getId());
-        return query.getSingleResult();
+        try {
+            TypedQuery<Author> query = em.createQuery("SELECT a FROM Author a WHERE a.surname = :surname AND a.name = :name",
+                    Author.class);
+            query.setParameter("surname", author.getSurname());
+            query.setParameter("name", author.getName());
+            return query.getSingleResult();
+        } catch (NoResultException exception) {
+        }
+        return null;
     }
 
     @Override
-    public List<Author> getAuthorsByBookId(long bookId) {
-        TypedQuery<Author> query = em.createQuery("SELECT a FROM Author a JOIN a.book b WHERE b.id = :bookId",
+    public Set<Author> getAuthorsByBookId(long bookId) {
+        TypedQuery<Author> query = em.createQuery("SELECT a FROM Author a JOIN Book b WHERE b.id = :bookId",
                 Author.class);
-        query.setParameter("bookId", bookId);
-        return query.getResultList();
+      //  query.setParameter("bookId", bookId);
+        return new HashSet<Author>(query.getResultList());
     }
 
 }

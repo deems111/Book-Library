@@ -31,7 +31,6 @@ public class GenreDaoImpl implements GenreDao {
         }
     }
 
-
     /**
      * When throw 'javax.persistence.NoResultException' exception, return null
      */

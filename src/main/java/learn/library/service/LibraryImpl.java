@@ -86,7 +86,9 @@ public class LibraryImpl implements Library {
         commentDao.deleteCommentsToBook(bookId);
     }
 
-
-
+    @Override
+    public List<Comment> getCommentsByBookId(long bookId) {
+        return commentDao.getCommentsByBookId(bookId);
+    }
 
 }

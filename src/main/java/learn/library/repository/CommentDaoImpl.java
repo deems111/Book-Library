@@ -1,6 +1,5 @@
 package learn.library.repository;
 
-import learn.library.entity.Author;
 import learn.library.entity.Comment;
 import learn.library.repository.interfaces.CommentDao;
 import org.springframework.stereotype.Repository;

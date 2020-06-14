@@ -1,31 +1,27 @@
-package testDao;
+package learn.library.repository;
 
-import configuration.TestConfig;
 import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
 import learn.library.entity.Genre;
-import learn.library.repository.BookDaoImpl;
-import learn.library.repository.CommentDaoImpl;
-import net.bytebuddy.build.ToStringPlugin;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.Assert;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @Import(value = {CommentDaoImpl.class})
-@ContextConfiguration(classes = TestConfig.class)
-public class TestCommentDao {
+public class CommentDaoImplTest {
 
     @Autowired
     private CommentDaoImpl commentDao;
@@ -33,18 +29,18 @@ public class TestCommentDao {
     @Autowired
     private TestEntityManager testEntityManager;
 
-    private String TEST_AUTHOR_NAME = "Test_author_name";
-    private String TEST_AUTHOR_SURNAME = "Test_author_surname";
-    private String TEST_GENRE_NAME = "Test genre name";
-    private String TEST_BOOK_TITLE = "Test book title";
-    private String TEST_COMMENT_AUTHOR_NAME = "Test Name";
-    private String TEST_COMMENT_AUTHOR_SUBJECT = "Test subject";
+    private static String TEST_AUTHOR_NAME = "Test_author_name";
+    private static String TEST_AUTHOR_SURNAME = "Test_author_surname";
+    private static String TEST_GENRE_NAME = "Test genre name";
+    private static String TEST_BOOK_TITLE = "Test book title";
+    private static String TEST_COMMENT_AUTHOR_NAME = "Test Name";
+    private static String TEST_COMMENT_AUTHOR_SUBJECT = "Test subject";
 
-    private Author author = new Author(null, new Book(), TEST_AUTHOR_SURNAME, TEST_AUTHOR_NAME);
+    private Author author = new Author(null, TEST_AUTHOR_SURNAME, TEST_AUTHOR_NAME);
     private Genre genre = new Genre(TEST_GENRE_NAME);
 
     @Test
-    private void addComment() {
+    public void addComment() {
         Book book = addBook();
         Comment comment = new Comment(TEST_COMMENT_AUTHOR_NAME, TEST_COMMENT_AUTHOR_SUBJECT, book);
         commentDao.addComment(comment);
@@ -63,14 +59,14 @@ public class TestCommentDao {
 
     }
 
-@Test
+    @Test
     public void deleteCommentsToBook() {
-    Book book = addBook();
-    Comment comment = new Comment(TEST_COMMENT_AUTHOR_NAME, TEST_COMMENT_AUTHOR_SUBJECT, book);
-    long id = commentDao.addComment(comment);
-    commentDao.deleteCommentsToBook(book.getId());
+        Book book = addBook();
+        Comment comment = new Comment(TEST_COMMENT_AUTHOR_NAME, TEST_COMMENT_AUTHOR_SUBJECT, book);
+        long id = commentDao.addComment(comment);
+        commentDao.deleteCommentsToBook(book.getId());
 
-    Assert.isTrue(commentDao.getCommentsByBookId(book.getId()).isEmpty(), "Deleted comment is not null");
+        Assert.isTrue(commentDao.getCommentsByBookId(book.getId()).isEmpty(), "Deleted comment is not null");
     }
 
     private Set<Author> setAuthor() {
@@ -85,9 +81,8 @@ public class TestCommentDao {
     }
 
     public Book addBook() {
-        Book book = new Book(TEST_BOOK_TITLE, setGenre(), setAuthor(), null);
+        Book book = new Book(TEST_BOOK_TITLE, setGenre(), setAuthor());
         for (Author author : book.getAuthors()) {
-            author.setBook(book);
             testEntityManager.persist(author);
         }
         return testEntityManager.persist(book);

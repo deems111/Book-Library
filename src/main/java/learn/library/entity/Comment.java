@@ -1,6 +1,5 @@
 package learn.library.entity;
 
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,14 +15,14 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column
+    @Column(name = "name")
     private String name;
 
-    @Column
+    @Column(name = "subject")
     private String subject;
 
     @JoinColumn(name = "ID_BOOK")
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private Book book;
 
     public Comment(String name, String subject, Book book) {
@@ -31,4 +30,5 @@ public class Comment {
         this.subject = subject;
         this.book = book;
     }
+
 }

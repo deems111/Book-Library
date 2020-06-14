@@ -1,23 +1,21 @@
-package testDao;
+package learn.library.repository;
 
-import configuration.TestConfig;
 import learn.library.entity.Genre;
-import learn.library.repository.GenreDaoImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.Assert;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @Import({GenreDaoImpl.class})
-@ContextConfiguration(classes = TestConfig.class)
-public class TestGenreDao {
+class GenreDaoImplTest {
 
     @Autowired
     private GenreDaoImpl genreDao;
@@ -40,7 +38,6 @@ public class TestGenreDao {
     public void deleteGenre() {
         testGenre.setName(TEST_GENRE_NAME);
         genreDao.addGenre(testGenre);
-
         genreDao.deleteGenre(genreDao.getGenre(TEST_GENRE_NAME).getId());
 
         Assert.isNull(genreDao.getGenre(TEST_GENRE_NAME), "Genre delete is not OK");

@@ -9,12 +9,10 @@ import learn.library.service.interfaces.Library;
 import learn.library.util.Utility;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,7 +51,7 @@ public class ShellModel {
      */
     @ShellMethod(value = "Get books by Author", key = "author")
     public String getBooksByAuthor(@ShellOption String surname, String name) {
-        return convertListToShellString(library.getBooksByAuthor(new Author(null, new Book(), surname, name)));
+        return convertListToShellString(library.getBooksByAuthor(new Author(null, surname, name)));
     }
 
     @ShellMethod(value = "Get By Id", key = "id")
@@ -102,7 +100,7 @@ public class ShellModel {
             @ShellOption String author,
             @ShellOption String genre) {
 
-        Book book = new Book(title, setGenreForAddBook(genre), convertAuthorsArrayToSet(author), null);
+        Book book = new Book(title, setGenreForAddBook(genre), convertAuthorsArrayToSet(author));
 
         if (isBookExist(book)) {
             return "Book already exist";
@@ -150,6 +148,24 @@ public class ShellModel {
         return "Comment to book with id = " + bookId + " deleted successfully";
     }
 
+    @ShellMethod(value = "Get all comments to book", key = "getCommentBook")
+    public String getCommentsToBook(@ShellOption long bookId) {
+        return convertCommentsToShellString(library.getCommentsByBookId(bookId));
+    }
+
+    private String convertCommentsToShellString(List<Comment> comments) {
+        StringBuilder stringBuilder = new StringBuilder("Comments listing");
+        if (comments.size() > 0) {
+            for (Comment comment : comments) {
+                stringBuilder.append("\nAuthor's name: ").append(comment.getName());
+                stringBuilder.append("\tSubject: ").append(comment.getSubject());
+            }
+        } else {
+            stringBuilder.append("\nNo comments to book found");
+        }
+        return stringBuilder.toString();
+    }
+
     /**
      * Method convert entity of book into table to show using shell
      */
@@ -164,15 +180,6 @@ public class ShellModel {
                 }
                 stringBuilder.append("Genre: ");
                 stringBuilder.append(book.getGenre().getName()).append("\t");
-
-                if (book.getComments() != null && !book.getComments().isEmpty()) {
-                    stringBuilder.append("\nComments: ");
-                    for (Comment comment : book.getComments()) {
-                        stringBuilder.append("\nAuthor's name: ").append(comment.getName());
-                        stringBuilder.append("\tSubject: ").append(comment.getSubject());
-                    }
-                }
-
             }
         } else {
             stringBuilder.append("\nNo books found");
@@ -197,7 +204,7 @@ public class ShellModel {
         return stringBuilder.toString();
     }
 
-    /***
+    /**
      * Method convert shell strings with Author's name and surname to object of Author.class
      */
     public static Set<Author> convertAuthorsArrayToSet(String authorStr) {
@@ -205,7 +212,7 @@ public class ShellModel {
         String[] nameSurname = authorStr.split(";");
         for (String str : nameSurname) {
             String[] author = str.split(",");
-            authors.add(new Author(null, new Book(), author[0], author[1]));
+            authors.add(new Author(null, author[0], author[1]));
         }
 
         return authors;

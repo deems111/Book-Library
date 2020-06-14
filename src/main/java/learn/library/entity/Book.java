@@ -1,6 +1,8 @@
 package learn.library.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "BOOK")
+@NamedEntityGraph(name = "book_genre_entity_graph",
+        attributeNodes = {@NamedAttributeNode("genre")})
 public class Book {
 
     @Id
@@ -20,24 +24,23 @@ public class Book {
     @Column(name = "title")
     private String title;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_GENRE")
     private Genre genre;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy="book", cascade=CascadeType.PERSIST)
+    @Fetch(FetchMode.SUBSELECT)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "BOOK_AUTHOR",
+            joinColumns = @JoinColumn(name = "ID_BOOK"), inverseJoinColumns = @JoinColumn(name = "ID_AUTHOR"))
     private Set<Author> authors;
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy="book", cascade = CascadeType.PERSIST)
-    private Set<Comment> comments;
 
     public Book() {
     }
 
-    public Book(String title, Genre genre, Set<Author> authors, Set<Comment> comments) {
+    public Book(String title, Genre genre, Set<Author> authors) {
         this.title = title;
         this.genre = genre;
         this.authors = authors;
-        this.comments = comments;
     }
 
     @Override
@@ -57,19 +60,13 @@ public class Book {
         if (book.getAuthors().size() != getAuthors().size()) {
             return false;
         }
-        Author.AuthorComparator comparator = new Author.AuthorComparator();
-        List<Author> authors = new ArrayList<>(getAuthors());
-        List<Author> anotherAuthors = new ArrayList<>(book.getAuthors());
-        authors.sort(comparator);
-        anotherAuthors.sort(comparator);
-
-        return listEquals(authors, anotherAuthors);
+        return listEquals(new ArrayList<>(getAuthors()),
+                new ArrayList<>(book.getAuthors()));
     }
 
     private boolean listEquals(List<Author> authors, List<Author> anotherAuthors) {
         for (int i = 0; i < authors.size(); i++) {
-            if (!authors.get(i).getSurname().equalsIgnoreCase(anotherAuthors.get(i).getSurname())
-                    || !authors.get(i).getName().equalsIgnoreCase(anotherAuthors.get(i).getName())) {
+            if (!authors.get(i).equals(anotherAuthors.get(i))) {
                 return false;
             }
         }
