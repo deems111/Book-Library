@@ -4,7 +4,6 @@ import learn.library.entity.Author;
 import learn.library.repository.interfaces.AuthorDao;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -21,7 +20,6 @@ public class AuthorDaoImpl implements AuthorDao {
     private final EntityManager em;
 
     @Override
-    @Transactional
     public long addAuthor(Author author) {
         em.persist(author);
         return getAuthor(author).getId();
@@ -54,7 +52,7 @@ public class AuthorDaoImpl implements AuthorDao {
     public Set<Author> getAuthorsByBookId(long bookId) {
         TypedQuery<Author> query = em.createQuery("SELECT a FROM Author a JOIN Book b WHERE b.id = :bookId",
                 Author.class);
-      //  query.setParameter("bookId", bookId);
+        query.setParameter("bookId", bookId);
         return new HashSet<Author>(query.getResultList());
     }
 

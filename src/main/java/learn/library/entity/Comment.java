@@ -22,7 +22,7 @@ public class Comment {
     private String subject;
 
     @JoinColumn(name = "ID_BOOK")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
 
     public Comment(String name, String subject, Book book) {

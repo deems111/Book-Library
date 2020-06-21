@@ -3,7 +3,6 @@ package learn.library.repository;
 import learn.library.entity.Comment;
 import learn.library.repository.interfaces.CommentDao;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -17,7 +16,6 @@ public class CommentDaoImpl implements CommentDao {
     private EntityManager em;
 
     @Override
-    @Transactional
     public long addComment(Comment comment) {
         em.persist(comment);
         return em.find(Comment.class, comment.getId()).getId();
@@ -36,7 +34,6 @@ public class CommentDaoImpl implements CommentDao {
     }
 
     @Override
-    @Transactional
     public boolean deleteCommentsToBook(long bookId) {
         boolean result = false;
         for (Comment comment : getCommentsByBookId(bookId)) {
@@ -47,7 +44,6 @@ public class CommentDaoImpl implements CommentDao {
     }
 
     @Override
-    @Transactional
     public void deleteComment(long id) {
         Comment comment = getComment(id);
         if (comment != null) {

@@ -1,6 +1,5 @@
 package learn.library.repository;
 
-import configuration.TestConfig;
 import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.entity.Genre;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.Assert;
 
@@ -22,8 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @Import({AuthorDaoImpl.class})
-@ContextConfiguration(classes = TestConfig.class)
-class AuthorDaoImplTest {
+public class AuthorDaoImplTest {
 
     @Autowired
     private TestEntityManager testEntityManager;

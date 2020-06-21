@@ -3,8 +3,6 @@ package learn.library.repository;
 import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.entity.Genre;
-import lombok.val;
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @Import(value = {AuthorDaoImpl.class, GenreDaoImpl.class, BookDaoImpl.class, CommentDaoImpl.class})
-class BookDaoImplTest {
+public class BookDaoImplTest {
 
     @Autowired
     private AuthorDaoImpl authorDao;
@@ -36,10 +34,10 @@ class BookDaoImplTest {
     @Autowired
     private TestEntityManager testEntityManager;
 
-    private static String TEST_AUTHOR_NAME = "Test_author_name";
-    private static String TEST_AUTHOR_SURNAME = "Test_author_surname";
-    private static String TEST_GENRE_NAME = "Test genre name";
-    private static String TEST_BOOK_TITLE = "Test book title";
+    private static final String TEST_AUTHOR_NAME = "Test_author_name";
+    private static final String TEST_AUTHOR_SURNAME = "Test_author_surname";
+    private static final String TEST_GENRE_NAME = "Test genre name";
+    private static final String TEST_BOOK_TITLE = "Test book title";
 
     private Author author = new Author(null, TEST_AUTHOR_SURNAME, TEST_AUTHOR_NAME);
     private Genre genre = new Genre(TEST_GENRE_NAME);
@@ -58,14 +56,20 @@ class BookDaoImplTest {
 
     @Test
     public void deleteBook() {
-        Book book = new Book(TEST_BOOK_TITLE, setGenre(), setAuthor());
+        Book book = new Book(TEST_BOOK_TITLE + "to delete", setGenre(), setAuthor());
         for (Author author : book.getAuthors()) {
             testEntityManager.persist(author);
         }
-        long id = testEntityManager.persist(book).getId();
-        bookDao.deleteBookById(id);
+        long bookID = bookDao.addBook(book);
+        int sizeBeforeDelete = bookDao.getBooks().size();
+        bookDao.deleteBookById(bookID);
+        int sizeAfterDelete = bookDao.getBooks().size();
 
-        Assert.isTrue(bookDao.getBooksById(id) == null, "Delete book by author is not null");
+        Assert.isTrue(sizeBeforeDelete - sizeAfterDelete == 1, "Size difference is not 1");
+        Assert.isTrue(bookDao.getBooksByTitle(TEST_BOOK_TITLE + "to delete").size() == 0, "Get book by title is not null");
+        Assert.isTrue(commentDao.getCommentsByBookId(bookID).size() == 0, "Get book comments is not null");
+
+
     }
 
     private Set<Author> setAuthor() {

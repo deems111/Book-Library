@@ -29,12 +29,12 @@ public class CommentDaoImplTest {
     @Autowired
     private TestEntityManager testEntityManager;
 
-    private static String TEST_AUTHOR_NAME = "Test_author_name";
-    private static String TEST_AUTHOR_SURNAME = "Test_author_surname";
-    private static String TEST_GENRE_NAME = "Test genre name";
-    private static String TEST_BOOK_TITLE = "Test book title";
-    private static String TEST_COMMENT_AUTHOR_NAME = "Test Name";
-    private static String TEST_COMMENT_AUTHOR_SUBJECT = "Test subject";
+    private static final String TEST_AUTHOR_NAME = "Test_author_name";
+    private static final String TEST_AUTHOR_SURNAME = "Test_author_surname";
+    private static final String TEST_GENRE_NAME = "Test genre name";
+    private static final String TEST_BOOK_TITLE = "Test book title";
+    private static final String TEST_COMMENT_AUTHOR_NAME = "Test Name";
+    private static final String TEST_COMMENT_AUTHOR_SUBJECT = "Test subject";
 
     private Author author = new Author(null, TEST_AUTHOR_SURNAME, TEST_AUTHOR_NAME);
     private Genre genre = new Genre(TEST_GENRE_NAME);

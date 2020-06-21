@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @Import({GenreDaoImpl.class})
-class GenreDaoImplTest {
+public class GenreDaoImplTest {
 
     @Autowired
     private GenreDaoImpl genreDao;
@@ -23,7 +23,7 @@ class GenreDaoImplTest {
     @Autowired
     private TestEntityManager testEntityManager;
 
-    private String TEST_GENRE_NAME = "Test genre name";
+    private static final String TEST_GENRE_NAME = "Test genre name";
     private Genre testGenre = new Genre();
 
     @Test

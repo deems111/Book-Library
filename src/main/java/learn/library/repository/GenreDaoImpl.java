@@ -3,7 +3,6 @@ package learn.library.repository;
 import learn.library.entity.Genre;
 import learn.library.repository.interfaces.GenreDao;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -17,7 +16,6 @@ public class GenreDaoImpl implements GenreDao {
     private EntityManager em;
 
     @Override
-    @Transactional
     public long addGenre(Genre genre) {
         em.persist(genre);
         return getGenre(genre.getName()).getId();
