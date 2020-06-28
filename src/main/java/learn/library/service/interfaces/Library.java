@@ -22,17 +22,17 @@ public interface Library {
 
     void deleteBookById(long id);
 
-    long addGenre(Genre genre);
+    Genre addGenre(Genre genre);
 
-    long addBook(Book book);
+    Book addBook(Book book);
 
     Genre getGenre(String genre);
 
-    long addComment(Comment comment);
+    Comment addComment(Comment comment);
 
     void deleteComment(long id);
 
-    void deleteCommentByBookId(long bookId);
+    void deleteCommentByBookId(Long bookId);
 
     List<Comment> getCommentsByBookId(long bookId);
 

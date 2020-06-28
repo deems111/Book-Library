@@ -106,7 +106,7 @@ public class ShellModel {
             return "Book already exist";
         }
 
-        long id = library.addBook(book);
+        long id = library.addBook(book).getId();
         return "Book was added with id = " + id;
     }
 
@@ -192,6 +192,9 @@ public class ShellModel {
      * Method convert entity of book into table to show using shell
      */
     public static String convertBookToShellString(Book book) {
+        if (book == null) {
+            return "No book(s) found";
+        }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Title: ").append(book.getTitle()).append("\t");
         stringBuilder.append("Author(s): ");
@@ -221,7 +224,7 @@ public class ShellModel {
     private Genre setGenreForAddBook(String genre) {
         Genre genreAdd = library.getGenre(genre);
         if (genreAdd == null) {
-            genreAdd = new Genre(library.addGenre(new Genre(genre)), genre);
+            genreAdd = library.addGenre(new Genre(genre));
         }
         return genreAdd;
     }

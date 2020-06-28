@@ -1,36 +1,24 @@
-package learn.library.repository;
+package learn.library.repository.interfaces;
 
 import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.entity.Genre;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.Assert;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @DataJpaTest
-@ExtendWith(SpringExtension.class)
-@Import(value = {AuthorDaoImpl.class, GenreDaoImpl.class, BookDaoImpl.class, CommentDaoImpl.class})
-public class BookDaoImplTest {
+public class BookRepositoryTest {
 
     @Autowired
-    private AuthorDaoImpl authorDao;
+    private BookRepository bookRepository;
     @Autowired
-    private GenreDaoImpl genreDao;
-    @Autowired
-    private BookDaoImpl bookDao;
-    @Autowired
-    private CommentDaoImpl commentDao;
-
+    private CommentRepository commentRepository;
     @Autowired
     private TestEntityManager testEntityManager;
 
@@ -48,11 +36,12 @@ public class BookDaoImplTest {
         for (Author author : book.getAuthors()) {
             testEntityManager.persist(author);
         }
-        bookDao.addBook(book);
+        bookRepository.saveAndFlush(book);
 
-        Assert.isTrue(bookDao.getBooksByAuthor(author).size() == 1, "Get book by author is null");
-        Assert.isTrue(bookDao.getBooksByTitle(TEST_BOOK_TITLE).size() == 1, "Get book by title is null");
+        Assert.isTrue(bookRepository.findByAuthors(author).size() == 1, "Get book by author is null");
+        Assert.isTrue(bookRepository.findByTitle(TEST_BOOK_TITLE).size() == 1, "Get book by title is null");
     }
+
 
     @Test
     public void deleteBook() {
@@ -60,14 +49,14 @@ public class BookDaoImplTest {
         for (Author author : book.getAuthors()) {
             testEntityManager.persist(author);
         }
-        long bookID = bookDao.addBook(book);
-        int sizeBeforeDelete = bookDao.getBooks().size();
-        bookDao.deleteBookById(bookID);
-        int sizeAfterDelete = bookDao.getBooks().size();
+        long bookID = bookRepository.save(book).getId();
+        int sizeBeforeDelete = bookRepository.findAll().size();
+        bookRepository.deleteById(bookID);
+        int sizeAfterDelete = bookRepository.findAll().size();
 
         Assert.isTrue(sizeBeforeDelete - sizeAfterDelete == 1, "Size difference is not 1");
-        Assert.isTrue(bookDao.getBooksByTitle(TEST_BOOK_TITLE + "to delete").size() == 0, "Get book by title is not null");
-        Assert.isTrue(commentDao.getCommentsByBookId(bookID).size() == 0, "Get book comments is not null");
+        Assert.isTrue(bookRepository.findByTitle(TEST_BOOK_TITLE + "to delete").size() == 0, "Get book by title is not null");
+        Assert.isTrue(commentRepository.getCommentsByBookId(bookID).size() == 0, "Get book comments is not null");
 
 
     }

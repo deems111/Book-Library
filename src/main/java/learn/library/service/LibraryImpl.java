@@ -4,101 +4,117 @@ import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
 import learn.library.entity.Genre;
-import learn.library.repository.interfaces.AuthorDao;
-import learn.library.repository.interfaces.BookDao;
-import learn.library.repository.interfaces.CommentDao;
-import learn.library.repository.interfaces.GenreDao;
+import learn.library.repository.interfaces.*;
 import learn.library.service.interfaces.Library;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Data
 public class LibraryImpl implements Library {
 
-    private final BookDao bookDao;
-    private final AuthorDao authorDao;
-    private final GenreDao genreDao;
-    private final CommentDao commentDao;
+    private  BookDao bookDao;
+    private  AuthorDao authorDao;
+    private  GenreDao genreDao;
+    private  CommentDao commentDao;
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
+    private final CommentRepository commentRepository;
+    private final GenreRepository genreRepository;
 
-    public LibraryImpl(BookDao bookDao, AuthorDao authorDao, GenreDao genreDao, CommentDao commentDao) {
-        this.bookDao = bookDao;
-        this.authorDao = authorDao;
-        this.genreDao = genreDao;
-        this.commentDao = commentDao;
+    public LibraryImpl(BookRepository bookRepository, AuthorRepository authorRepository,
+                       CommentRepository commentRepository, GenreRepository genreRepository) {
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
+        this.genreRepository = genreRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Book> getBooks() {
-        return bookDao.getBooks();
+        return bookRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Book> getBooksByAuthor(Author author) {
-        return bookDao.getBooksByAuthor(author);
+        Author authorFromDB = authorRepository.findAuthorByNameAndSurname(author.getName(), author.getSurname());
+        return bookRepository.findByAuthors(authorFromDB);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Book> getBooksByTitle(String title) {
-        return bookDao.getBooksByTitle(title);
+        return bookRepository.findByTitle(title);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Book getBooksById(long id) {
-        return bookDao.getBooksById(id);
+        Optional<Book> book = bookRepository.findById(id);
+        if (book.isPresent()) {
+            return book.get();
+        }
+        return null;
     }
 
     @Override
     @Transactional
     public void deleteBookById(long id) {
-        bookDao.deleteBookById(id);
+        bookRepository.deleteById(id);
     }
 
     @Override
     @Transactional
-    public long addBook(Book book) {
-        return bookDao.addBook(book);
+    public Book addBook(Book book) {
+        for (Author author : book.getAuthors()) {
+            authorRepository.save(author);
+        }
+        return bookRepository.save(book);
     }
 
     @Override
     @Transactional
-    public long addGenre(Genre genre) {
-        return genreDao.addGenre(genre);
+    public Genre addGenre(Genre genre) {
+        return genreRepository.save(genre);
     }
 
     @Transactional(readOnly = true)
     public Genre getGenre(String genre) {
-        return genreDao.getGenre(genre);
+        return genreRepository.getGenre(genre);
     }
 
     @Override
     @Transactional
-    public long addComment(Comment comment) {
-        return commentDao.addComment(comment);
+    public Comment addComment(Comment comment) {
+        return commentRepository.save(comment);
     }
 
     @Override
     @Transactional
     public void deleteComment(long id) {
-        commentDao.deleteComment(id);
+        commentRepository.deleteById(id);
     }
 
     @Override
     @Transactional
-    public void deleteCommentByBookId(long bookId) {
-        commentDao.deleteCommentsToBook(bookId);
+    public void deleteCommentByBookId(Long bookId) {
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+        if (!optionalBook.isPresent()) {
+            return;
+        }
+        commentRepository.deleteCommentsToBook(optionalBook.get());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Comment> getCommentsByBookId(long bookId) {
-        return commentDao.getCommentsByBookId(bookId);
+        return commentRepository.getCommentsByBookId(bookId);
     }
 
 }
