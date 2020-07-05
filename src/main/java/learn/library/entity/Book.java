@@ -22,6 +22,7 @@ public class Book {
     @Column(name = "title")
     private String title;
 
+    @Fetch(FetchMode.JOIN)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_GENRE")
     private Genre genre;

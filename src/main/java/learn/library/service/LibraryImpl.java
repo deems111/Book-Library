@@ -17,10 +17,6 @@ import java.util.Optional;
 @Data
 public class LibraryImpl implements Library {
 
-    private  BookDao bookDao;
-    private  AuthorDao authorDao;
-    private  GenreDao genreDao;
-    private  CommentDao commentDao;
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final CommentRepository commentRepository;
