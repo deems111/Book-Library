@@ -1,9 +1,7 @@
 package learn.library.service.interfaces;
 
-import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
-import learn.library.entity.Genre;
 
 import java.util.List;
 
@@ -14,28 +12,23 @@ public interface Library {
 
     List<Book> getBooks();
 
-    List<Book> getBooksByAuthor(Author author);
+    List<Book> getBooksByAuthor(String author);
 
     List<Book> getBooksByTitle(String title);
 
-    Book getBooksById(long id);
+    Book getBooksById(String id);
 
-    void deleteBookById(long id);
-
-    Genre addGenre(Genre genre);
+    void deleteBookById(String id);
 
     Book addBook(Book book);
 
-    Genre getGenre(String genre);
-
     Comment addComment(Comment comment);
 
-    void deleteComment(long id);
+    void deleteComment(String id);
 
-    void deleteCommentByBookId(Long bookId);
+    void deleteCommentByBookId(String bookId);
 
-    List<Comment> getCommentsByBookId(long bookId);
-
+    List<Comment> getCommentsByBookId(String bookId);
 
 }
 

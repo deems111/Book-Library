@@ -1,42 +1,29 @@
 package learn.library.entity;
 
 import lombok.Data;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 @Data
-@Entity
-@Table(name = "BOOK")
+@Document(collection = "books")
 public class Book {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
-    @Column(name = "title")
     private String title;
 
-    @Fetch(FetchMode.JOIN)
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ID_GENRE")
-    private Genre genre;
+    private String genre;
 
-    @Fetch(FetchMode.SUBSELECT)
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "BOOK_AUTHOR",
-            joinColumns = @JoinColumn(name = "ID_BOOK"), inverseJoinColumns = @JoinColumn(name = "ID_AUTHOR"))
-    private Set<Author> authors;
+    private Set<String> authors;
 
     public Book() {
     }
 
-    public Book(String title, Genre genre, Set<Author> authors) {
+    public Book(String title, String genre, Set<String> authors) {
         this.title = title;
         this.genre = genre;
         this.authors = authors;
@@ -63,7 +50,7 @@ public class Book {
                 new ArrayList<>(book.getAuthors()));
     }
 
-    private boolean listEquals(List<Author> authors, List<Author> anotherAuthors) {
+    private boolean listEquals(List<String> authors, List<String> anotherAuthors) {
         for (int i = 0; i < authors.size(); i++) {
             if (!authors.get(i).equals(anotherAuthors.get(i))) {
                 return false;

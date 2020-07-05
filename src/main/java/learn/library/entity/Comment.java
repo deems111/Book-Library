@@ -1,28 +1,29 @@
 package learn.library.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
+import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
-@Entity
-@Table(name = "COMMENT")
+@AllArgsConstructor
+@Document(collection = "comments")
 public class Comment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @Column(name = "name")
+    private String id;
+    @Field
     private String name;
 
-    @Column(name = "subject")
+    @Field
     private String subject;
 
-    @JoinColumn(name = "ID_BOOK")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @DBRef
     private Book book;
 
     public Comment(String name, String subject, Book book) {

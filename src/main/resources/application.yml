@@ -1,18 +1,9 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: root
-    initialization-mode: always
-    jpa:
-      properties:
-        hibernate:
-          show_sql: true
-          format_sql: true
-      generate-ddl: false
-      hibernate:
-        ddl-auto: none
-
+  data:
+    mongodb:
+      database: library
+      port: 27017
+      host: localhost
 logging:
   level:
     org:

@@ -2,95 +2,86 @@ package learn.library.repository.interfaces;
 
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@DataMongoTest
 public class CommentRepositoryTest {
 
     @Autowired
     private CommentRepository commentRepository;
+
     @Autowired
-    private TestEntityManager testEntityManager;
+    private BookRepository bookRepository;
 
     private static final String SUBJECT = "TestSubject";
     private static final String NAME = "TestName";
     private static final Long TEST_ID = 1L;
+    private static final String TEST_AUTHOR = "Test_author_name_surname";
+    private static final String TEST_GENRE_NAME = "Test genre name";
+    private static final String TEST_BOOK_TITLE = "Test book title";
+
     private Book testBook;
 
-    private boolean canNotTest() {
-        try {
-            this.testBook = testEntityManager.find(Book.class, 1L);
-            return false;
-        } catch (NullPointerException e) {
-            e.printStackTrace(); //need book;
-            return true;
-        }
+    @BeforeEach
+    void init() {
+        bookRepository.deleteAll();
     }
 
     @Test
     public void addComment() {
-        if (canNotTest()) {
-            return;
-        }
+        createBook();
+
         Comment comment = commentRepository.save(new Comment(NAME, SUBJECT, testBook));
         assertThat(comment).isNotNull();
         assertThat(comment.getId()).isNotNull();
 
-        Comment commentTem = testEntityManager.find(Comment.class, comment.getId());
+        Comment commentTem = commentRepository.findCommentsByBook(testBook).get(0);
         assertThat(commentTem).isNotNull();
         assertThat(commentTem.equals(comment));
         assertThat(commentTem.getName().equalsIgnoreCase(NAME));
         assertThat(commentTem.getSubject().equalsIgnoreCase(SUBJECT));
-
     }
 
     @Test
     public void deleteCommentById() {
-        if (canNotTest()) {
-            return;
-        }
-        Comment comment = testEntityManager.find(Comment.class, TEST_ID);
-        assertThat(comment).isNotNull();
-        testEntityManager.detach(comment);
+        createBook();
+        Comment comment = commentRepository.save(new Comment(NAME, SUBJECT, testBook));
 
-        commentRepository.deleteById(TEST_ID);
-        Comment commnetTem = testEntityManager.find(Comment.class, TEST_ID);
-        assertThat(commnetTem).isNull();
+        commentRepository.deleteById(comment.getId());
+        List<Comment> comments = commentRepository.findCommentsByBook(testBook);
+        assertThat(comments).isEmpty();
     }
 
     @Test
     public void getCommentsByBookId() {
-        if (canNotTest()) {
-            return;
-        }
-        List<Comment> commentsBefore = commentRepository.getCommentsByBookId(TEST_ID);
+        createBook();
         Comment comment = commentRepository.save(new Comment(NAME, SUBJECT, testBook));
-        List<Comment> comments = commentRepository.getCommentsByBookId(TEST_ID);
+        Comment anotherComment = commentRepository.save(new Comment(NAME+ "another", SUBJECT + "another", testBook));
+
+        List<Comment> comments = commentRepository.findCommentsByBook(testBook);
 
         assertThat(!comments.isEmpty());
-        assertThat(commentsBefore.size() - 1 == comments.size());
-        assertThat(comments.containsAll(commentsBefore));
+        assertThat(comments.size()  == 2);
+        assertThat(comments.contains(comment));
+        assertThat(comments.contains(anotherComment));
+
     }
 
-    @Test
-    public void deleteCommentsByBookId() {
-        if (canNotTest()) {
-            return;
-        }
-        List<Comment> commentsBefore = commentRepository.getCommentsByBookId(TEST_ID);
-        assertThat(!commentsBefore.isEmpty());
+    private void createBook() {
+        Set<String> authors = new HashSet<>();
+        authors.add(TEST_AUTHOR);
+        Book book = new Book(TEST_BOOK_TITLE, TEST_GENRE_NAME, authors);
 
-        commentRepository.deleteCommentsToBook(testBook);
-        List<Comment> comments = commentRepository.getCommentsByBookId(TEST_ID);
-
-        assertThat(comments.isEmpty());
+        this.testBook = bookRepository.save(book);
     }
 
 }

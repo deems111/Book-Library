@@ -1,17 +1,16 @@
 package learn.library.repository.interfaces;
 
-import learn.library.entity.Author;
 import learn.library.entity.Book;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-@Repository
-public interface BookRepository extends JpaRepository<Book, Long> {
+public interface BookRepository extends MongoRepository<Book, String> {
 
-    List<Book> findByAuthors(Author authors);
+    List<Book> findByAuthors(String author);
 
     List<Book> findByTitle(String title);
+
+    void deleteById(String id);
 
 }

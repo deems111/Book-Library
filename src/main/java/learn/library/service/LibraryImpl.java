@@ -1,15 +1,14 @@
 package learn.library.service;
 
-import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
-import learn.library.entity.Genre;
 import learn.library.repository.interfaces.*;
 import learn.library.service.interfaces.Library;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,15 +17,10 @@ import java.util.Optional;
 public class LibraryImpl implements Library {
 
     private final BookRepository bookRepository;
-    private final AuthorRepository authorRepository;
     private final CommentRepository commentRepository;
-    private final GenreRepository genreRepository;
 
-    public LibraryImpl(BookRepository bookRepository, AuthorRepository authorRepository,
-                       CommentRepository commentRepository, GenreRepository genreRepository) {
+    public LibraryImpl(BookRepository bookRepository, CommentRepository commentRepository) {
         this.bookRepository = bookRepository;
-        this.authorRepository = authorRepository;
-        this.genreRepository = genreRepository;
         this.commentRepository = commentRepository;
     }
 
@@ -38,9 +32,8 @@ public class LibraryImpl implements Library {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Book> getBooksByAuthor(Author author) {
-        Author authorFromDB = authorRepository.findAuthorByNameAndSurname(author.getName(), author.getSurname());
-        return bookRepository.findByAuthors(authorFromDB);
+    public List<Book> getBooksByAuthor(String author) {
+        return bookRepository.findByAuthors(author);
     }
 
     @Override
@@ -51,7 +44,7 @@ public class LibraryImpl implements Library {
 
     @Override
     @Transactional(readOnly = true)
-    public Book getBooksById(long id) {
+    public Book getBooksById(String id) {
         Optional<Book> book = bookRepository.findById(id);
         if (book.isPresent()) {
             return book.get();
@@ -61,28 +54,14 @@ public class LibraryImpl implements Library {
 
     @Override
     @Transactional
-    public void deleteBookById(long id) {
+    public void deleteBookById(String id) {
         bookRepository.deleteById(id);
     }
 
     @Override
     @Transactional
     public Book addBook(Book book) {
-        for (Author author : book.getAuthors()) {
-            authorRepository.save(author);
-        }
         return bookRepository.save(book);
-    }
-
-    @Override
-    @Transactional
-    public Genre addGenre(Genre genre) {
-        return genreRepository.save(genre);
-    }
-
-    @Transactional(readOnly = true)
-    public Genre getGenre(String genre) {
-        return genreRepository.getGenre(genre);
     }
 
     @Override
@@ -93,24 +72,28 @@ public class LibraryImpl implements Library {
 
     @Override
     @Transactional
-    public void deleteComment(long id) {
+    public void deleteComment(String id) {
         commentRepository.deleteById(id);
     }
 
     @Override
     @Transactional
-    public void deleteCommentByBookId(Long bookId) {
+    public void deleteCommentByBookId(String bookId) {
         Optional<Book> optionalBook = bookRepository.findById(bookId);
         if (!optionalBook.isPresent()) {
             return;
         }
-        commentRepository.deleteCommentsToBook(optionalBook.get());
+        commentRepository.deleteAllByBook(optionalBook.get());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Comment> getCommentsByBookId(long bookId) {
-        return commentRepository.getCommentsByBookId(bookId);
+    public List<Comment> getCommentsByBookId(String bookId) {
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+        if (optionalBook.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return commentRepository.findCommentsByBook(optionalBook.get());
     }
 
 }
