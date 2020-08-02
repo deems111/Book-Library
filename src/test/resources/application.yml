@@ -2,7 +2,7 @@ spring:
   data:
     mongodb:
       database: library
-      port: 27017
+      port: 0
       host: localhost
 logging:
   level:

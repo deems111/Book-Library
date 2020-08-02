@@ -1,22 +1,33 @@
 package learn.library.repository.interfaces;
 
+import Configuration.Config;
+import com.github.cloudyrock.mongock.SpringMongock;
 import learn.library.entity.Book;
+import learn.library.entity.Comment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.Assert;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @DataMongoTest
+@Import(Config.class)
 public class BookRepositoryTest {
 
     @Autowired
     private BookRepository bookRepository;
     @Autowired
-    private CommentRepository commentRepository;
+    private MongoTemplate mongoTemplate;
+    @Autowired
+    private SpringMongock mongock;
 
     private static final String TEST_AUTHOR = "Test_author_name_surname";
     private static final String TEST_GENRE_NAME = "Test genre name";
@@ -24,38 +35,48 @@ public class BookRepositoryTest {
 
     @BeforeEach
     void init() {
-        bookRepository.deleteAll();
+        mongock.execute();
     }
 
     @Test
     public void addBook() {
 
+        int count = mongoTemplate.findAll(Book.class).size();
         bookRepository.save(createBook());
 
-        Assert.isTrue(bookRepository.findAll().size() == 1, "Get books <> 1");
-        Assert.isTrue(bookRepository.findByAuthors(TEST_AUTHOR).size() == 1, "Get book by author <> 1");
-        Assert.isTrue(bookRepository.findByTitle(TEST_BOOK_TITLE).size() == 1, "Get book by title <> 1");
+        Assert.isTrue(mongoTemplate.findAll(Book.class).size() == count + 1, "Get books <> 1");
+        Query query = new Query();
+        query.addCriteria(Criteria.where("title").is(TEST_BOOK_TITLE));
+        Assert.isTrue(mongoTemplate.find(query, Book.class).size() == 1, "Get book by title <> 1");
+        query = new Query();
+        query.addCriteria(Criteria.where("genre").is(TEST_GENRE_NAME));
+        Assert.isTrue(mongoTemplate.find(query, Book.class).size()  == 1, "Get book by genre <> 1");
     }
 
     @Test
     public void deleteBook() {
 
-        Book book = bookRepository.save(createBook());
+        Book book = mongoTemplate.save(createBook());
 
-        int sizeBeforeDelete = bookRepository.findAll().size();
+        int sizeBeforeDelete = mongoTemplate.findAll(Book.class).size();
         bookRepository.deleteById(book.getId());
-        int sizeAfterDelete = bookRepository.findAll().size();
+        int sizeAfterDelete = mongoTemplate.findAll(Book.class).size();
 
         Assert.isTrue(sizeBeforeDelete - sizeAfterDelete == 1, "Size difference is not 1");
-        Assert.isTrue(bookRepository.findByTitle(TEST_BOOK_TITLE + "to delete").size() == 0, "Get book by title is not null");
-        Assert.isTrue(commentRepository.findCommentsByBook(book).size() == 0, "Get book comments size is not 0");
-
+        Query query = new Query();
+        query.addCriteria(Criteria.where("title").is("Test book title to delete"));
+        Assert.isTrue(mongoTemplate.find(query, Book.class).size() == 0, "Get book by title is not null");
+        query = new Query();
+        query.addCriteria(Criteria.where("book").is(book));
+        Assert.isTrue(mongoTemplate.find(query, Comment.class).size() == 0, "Get book by title is not null");
     }
 
     @Test
     public void getBookByAuthorTest() throws Exception {
 
-        Book book = bookRepository.save(createBook());
+        Book book = mongoTemplate.save(createBook());
+
+        List<Book> books = mongoTemplate.findAll(Book.class);
 
         Assert.isTrue(bookRepository.findByAuthors(TEST_AUTHOR).size() == 1, "Get book comments size is not 1");
         Assert.isTrue(bookRepository.findByAuthors(TEST_AUTHOR).get(0)

@@ -55,7 +55,11 @@ public class LibraryImpl implements Library {
     @Override
     @Transactional
     public void deleteBookById(String id) {
-        bookRepository.deleteById(id);
+        Optional<Book> optionalBook = bookRepository.findById(id);
+        if (optionalBook.isPresent()) {
+            bookRepository.deleteById(id);
+            commentRepository.deleteAllByBook(optionalBook.get());
+        }
     }
 
     @Override
