@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Book list</title>
+    <link rel="stylesheet" type="text/css" href="style/style.css">
+
+</head>
+<body>
+<div>
+    <h1>Book List</h1>
+    <table class="table" id="booktable">
+        <thead>
+        <tr>
+            <th>Book ID</th>
+            <th>Title</th>
+            <th>Authors</th>
+            <th>View</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="book: ${books}">
+            <td th:text="${book.id}">Book ID</td>
+            <td th:text="${book.title}">Name</td>
+            <td th:text="${book.authors}">Brand</td>
+            <td>
+                <a th:href="@{/view(id=${book.id})}" href="view.html">View Book</a>&nbsp;
+                <a th:href="@{/edit(id=${book.id})}" href="edit.html">Edit Book</a>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="footer">
+    <a href="/add">Add New Book</a>
+</div>
+</body>
+</html>
