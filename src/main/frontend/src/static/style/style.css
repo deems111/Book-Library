@@ -12,7 +12,14 @@ body {
 div {
   border-radius: 5px;
   background-color: #f2f2f2;
-  padding: 20px;
+  padding: 5px;
+}
+
+div.content {
+  display: table;
+  margin: 0 auto;
+   padding: 5px 5px;
+   width: 95%
 }
 
 input[type=text], select {
@@ -41,17 +48,39 @@ input[type=submit]:hover {
 }
 
 table {
-  display: inline-block;
-  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+width: 80%;
+    border: solid 1px #DDEEEE;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 
-table, th, td {
-  border: 1px solid black;
+thead th {
+    background-color: #4CAF50;
+    border: solid 1px #DDEEEE;
+    padding: 16px;
+    color: white;
+    text-shadow: 2px 2px 2px #000000;
+}
+
+tbody td {
+    border: solid 1px #DDEEEE;
+    color: #333;
+    padding: 10px;
+    text-align: left;
 }
 
 .button {
   background-color: #4CAF50; /* Green */
-  border: none;
+  border: 4px double pink;
+  color: white;
+  padding: 16px 32px;
+}
+
+.button[type=delete] {
+  background-color: red;
+  border: 4px double pink;
   color: white;
   padding: 16px 32px;
 }

@@ -12,7 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 
 @Service
 @Data
@@ -35,7 +39,8 @@ public class LibraryImpl implements Library {
     @Override
     @Transactional(readOnly = true)
     public List<Book> getBooks() {
-        return bookRepository.findAll();
+        List<Book> books =  bookRepository.findAll();
+        return books;
     }
 
     @Override
@@ -79,7 +84,7 @@ public class LibraryImpl implements Library {
     }
 
     @Transactional
-    public Book addBook(String authors,String title, String genre) {
+    public Book addBookDto(String authors,String title, String genre) {
         Book book = new Book(title, setGenreForAddBook(genre), ConvertUtil.convertAuthorsArrayToSet(authors));
         if(!isBookExist(book)) {
             return addBook(book);

@@ -2,10 +2,12 @@ package learn.library.entity.dto;
 
 import learn.library.entity.Author;
 import learn.library.entity.Book;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Set;
 
+@AllArgsConstructor
 @Data
 public class BookDto {
 
@@ -18,7 +20,7 @@ public class BookDto {
         this.id = book.getId();
         this.authors = setAuthors(book.getAuthors());
         this.title = book.getTitle();
-        genre = book.getGenre().getName();
+        this.genre = book.getGenre().getName();
     }
 
     private String setAuthors(Set<Author> authors) {
