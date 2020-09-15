@@ -10,8 +10,10 @@
 <div id="edit">
             <h1>Edit Book</h1>
             <br />
-            <form action="#" th:action="@{/update}" th:object="${book}"
-                              method="post">
+            <form
+                  th:action="@{/update}"
+                  th:object="${book}"
+                  method="post">
      
                 <table>
                     <tr>             
@@ -26,7 +28,7 @@
                     </tr>
                     <tr>
                         <td>Authors:</td>
-                        <td><input type="text" th:field="*{authors}" /></td>
+                        <td><input type="text" th:field="*{authorString}" /></td>
                     </tr>
                     <tr>
                         <td>Genre:</td>

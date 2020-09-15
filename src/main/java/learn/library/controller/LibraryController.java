@@ -8,11 +8,16 @@ import learn.library.service.LibraryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class LibraryController {
@@ -26,46 +31,31 @@ public class LibraryController {
 
     @GetMapping({"/", "/index"})
     public String getBooks(Model model) {
-        List<Book> books = libraryService.getBooks();
-        List<BookDto> bookDtos = new ArrayList<>();
-        for (Book book : books) {
-            bookDtos.add(new BookDto(book));
-        }
-        model.addAttribute("books", bookDtos);
+        model.addAttribute("books", libraryService.getBooks().stream().map(BookDto::new).collect(Collectors.toList()));
         return "index";
     }
 
     @GetMapping("/add")
-    public String addBook(Model model) {
+    public String addNewBookToModel(Model model) {
         model.addAttribute("book", new BookDto(new Book(null, new Genre(), new HashSet<>())));
         return "add";
     }
 
     @PostMapping("/add")
-    public String addBook(@RequestParam(name = "genre") String genre,
-                          @RequestParam(name = "title") String title,
-                          @RequestParam(name = "authors") String authors,
-                          Model model) {
-        libraryService.addBook(authors,title, genre);
+    public String addBook(@ModelAttribute BookDto bookDto) {
+        libraryService.addBook(bookDto);
         return "redirect:/";
     }
 
-    @GetMapping("/update")
-    public String updateBook(@RequestParam(name = "genre") String genre,
-                             @RequestParam(name = "title") String title,
-                             @RequestParam(name = "authors") String authors,
-                             @RequestParam(name = "id") Long id,
-                             Model model) {
-        Book book = libraryService.updateBook(id, authors, title, genre);
-        model.addAttribute("book", new BookDto(book));
-        return "edit";
+    @PostMapping("/delete/{book}")
+    public String deleteBook(@PathVariable Book book) {
+        libraryService.deleteBookById(book.getId());
+        return "redirect:/";
     }
 
-    @GetMapping("/delete")
-    public String deleteBook(@RequestParam(name = "id") Long id) {
-        if (libraryService.getBooksById(id) != null) {
-            libraryService.deleteBookById(id);
-        }
+    @PostMapping("/update")
+    public String updateBook(@ModelAttribute BookDto bookDto) {
+        libraryService.updateBook(bookDto);
         return "redirect:/";
     }
 
@@ -85,7 +75,7 @@ public class LibraryController {
             comments.add(new Comment("Нет комментариев к книге", null, book));
         }
         model.addAttribute("comments", comments);
-        model.addAttribute("book", new BookDto(book));
+        model.addAttribute("book", book == null ? new BookDto() : new BookDto(book));
         return "view";
     }
 

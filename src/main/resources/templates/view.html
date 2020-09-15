@@ -10,23 +10,25 @@
 <div>
     <h1>View book and comments</h1>
     <br/>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Book Title: </th>
-            <th>Book Authors:</th>
-            <th>Delete Book</th>
-        </tr>
-        </thead>
-        <tbody>
-            <td th:text="${book.title}">Title</td>
-            <td th:text="${book.authors}">Authors</td>
-            <td>
-                <a th:href="@{/delete(id=${book.id})}" href="delete.html">Delete Book</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <form method="post" th:action="@{/delete/__${book.id}__}">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Book Title: </th>
+                <th>Book Authors:</th>
+                <th>Delete Book</th>
+            </tr>
+            </thead>
+            <tbody>
+                <td th:text="${book.title}">Title</td>
+                <td th:text="${book.authorString}">Authors</td>
+                <td>
+                    <button type="submit">Delete Book</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
     <br/>
     <table class="table">
         <thead>

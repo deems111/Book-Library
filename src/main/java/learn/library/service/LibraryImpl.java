@@ -4,6 +4,7 @@ import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
 import learn.library.entity.Genre;
+import learn.library.entity.dto.BookDto;
 import learn.library.repository.interfaces.*;
 import learn.library.service.interfaces.Library;
 import learn.library.util.ConvertUtil;
@@ -78,9 +79,10 @@ public class LibraryImpl implements Library {
         return bookRepository.save(book);
     }
 
+    @Override
     @Transactional
-    public Book addBook(String authors,String title, String genre) {
-        Book book = new Book(title, setGenreForAddBook(genre), ConvertUtil.convertAuthorsArrayToSet(authors));
+    public Book addBook(BookDto bookDto) {
+        Book book = new Book(bookDto.getTitle(), setGenreForAddBook(bookDto.getGenre()), ConvertUtil.convertAuthorsArrayToSet(bookDto.getAuthorString()));
         if(!isBookExist(book)) {
             return addBook(book);
         }
@@ -89,8 +91,8 @@ public class LibraryImpl implements Library {
 
     @Override
     @Transactional
-    public Book updateBook(Long id, String authors, String title, String genre) {
-        Optional<Book> optionalBook = bookRepository.findById(id);
+    public Book updateBook(BookDto bookDto) {
+        Optional<Book> optionalBook = bookRepository.findById(bookDto.getId());
         Book updatedBook = null;
         try {
             updatedBook = optionalBook.get();
@@ -98,13 +100,13 @@ public class LibraryImpl implements Library {
             e.printStackTrace();
             return null;
         }
-        Set<Author> authorSet = ConvertUtil.convertAuthorsArrayToSet(authors);
+        Set<Author> authorSet = ConvertUtil.convertAuthorsArrayToSet(bookDto.getAuthorString());
         updatedBook.setAuthors(authorSet);
         for (Author author : authorSet) {
             authorRepository.save(author);
         }
-        updatedBook.setTitle(title);
-        updatedBook.setGenre(setGenreForAddBook(genre));
+        updatedBook.setTitle(bookDto.getTitle());
+        updatedBook.setGenre(setGenreForAddBook(bookDto.getGenre()));
 
         return bookRepository.save(updatedBook);
     }

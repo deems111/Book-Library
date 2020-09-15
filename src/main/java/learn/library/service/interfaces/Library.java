@@ -4,6 +4,7 @@ import learn.library.entity.Author;
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
 import learn.library.entity.Genre;
+import learn.library.entity.dto.BookDto;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -23,11 +24,13 @@ public interface Library {
 
     void deleteBookById(long id);
 
-    Book updateBook(Long id, String authors, String title, String genre);
+    Book updateBook(BookDto bookDto);
 
     Genre addGenre(Genre genre);
 
     Book addBook(Book book);
+
+    Book addBook(BookDto bookDto);
 
     Genre getGenre(String genre);
 
