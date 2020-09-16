@@ -6,19 +6,19 @@ class BookService {
   }
 
   getBook(id) {
-    return proxy.get(`/view/${id}`);
+    return proxy.get(`/book/${id}`);
   }
 
   createBook(newBook) {
-    return proxy.post("/create", newBook);
+    return proxy.post("/books", newBook);
   }
 
   updateBook(id, book) {
-    return proxy.put("/update/${id}", book);
+    return proxy.put("/book/${id}", book);
   }
 
   deleteBook(id) {
-    return proxy.delete(`/delete/${id}`);
+    return proxy.delete(`/book/${id}`);
   }
 
   getComments(id) {
