@@ -1,0 +1,86 @@
+html {
+    height: 100%;
+}
+body {
+    margin: 0;
+    height: 98%;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+div {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 5px;
+}
+
+div.content {
+  display: table;
+  margin: 0 auto;
+   padding: 5px 5px;
+   width: 95%
+}
+
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 15%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+table {
+  margin-left: auto;
+  margin-right: auto;
+width: 80%;
+    border: solid 1px #DDEEEE;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+thead th {
+    background-color: #4CAF50;
+    border: solid 1px #DDEEEE;
+    padding: 16px;
+    color: white;
+    text-shadow: 2px 2px 2px #000000;
+}
+
+tbody td {
+    border: solid 1px #DDEEEE;
+    color: #333;
+    padding: 10px;
+    text-align: left;
+}
+
+.button {
+  background-color: #4CAF50; /* Green */
+  border: 4px double pink;
+  color: white;
+  padding: 16px 32px;
+}
+
+.button[type=delete] {
+  background-color: red;
+  border: 4px double pink;
+  color: white;
+  padding: 16px 32px;
+}

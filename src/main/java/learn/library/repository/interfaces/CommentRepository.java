@@ -2,14 +2,14 @@ package learn.library.repository.interfaces;
 
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
+public interface CommentRepository extends ReactiveMongoRepository<Comment, String> {
 
-public interface CommentRepository extends MongoRepository<Comment, String> {
+    Mono<Void> deleteByBookId(String bookId);
 
-    void deleteAllByBook(Book book);
-
-    List<Comment> findCommentsByBook(Book book);
+    Flux<Comment> findCommentsByBook(Mono<Book> book);
 
 }
