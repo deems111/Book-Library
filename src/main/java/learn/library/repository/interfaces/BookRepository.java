@@ -1,13 +1,14 @@
 package learn.library.repository.interfaces;
 
 import learn.library.entity.Book;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
-import reactor.core.publisher.Flux;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface BookRepository extends ReactiveMongoRepository<Book, String> {
+import java.util.List;
 
-    Flux<Book> findByAuthors(String author);
+public interface BookRepository extends MongoRepository<Book, String> {
 
-    Flux<Book> findByTitle(String title);
+    List<Book> findByAuthors(String author);
+
+    List<Book> findByTitle(String title);
 
 }

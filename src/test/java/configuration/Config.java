@@ -1,6 +1,6 @@
-package Configuration;
+package configuration;
 
-import FillData.FillData;
+import fillData.FillData;
 import com.github.cloudyrock.mongock.SpringMongock;
 import com.github.cloudyrock.mongock.SpringMongockBuilder;
 import org.springframework.context.annotation.Bean;

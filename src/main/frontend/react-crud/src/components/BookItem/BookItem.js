@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Redirect } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import BookService from "../../services/BookService";
+import AuthorizationService from "../../services/AuthorizationService";
 
 const BookItem = props => {
   const initState = {
@@ -15,9 +16,20 @@ const BookItem = props => {
   const [comments, setComments] = useState(initState);
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
+  const [userRoleContent, setUserRoleContent] = useState(false);
+  const [adminRoleContent, setAdminRoleContent] = useState(false);
+  const [currentUser, setCurrentUser] = useState(undefined);
+
     useEffect(() => {
-        getBook(props.match.params.id);
-        getComments(props.match.params.id);
+        const user = AuthorizationService.getCurrentUser();
+        if (user) {
+            setCurrentUser(user);
+            setUserRoleContent(user.roles.includes("ROLE_USER"));
+            setAdminRoleContent(user.roles.includes("ROLE_ADMIN"));
+            getBook(props.match.params.id);
+            getComments(props.match.params.id);
+        }
+
     }, [props.match.params.id]);
 
     const handleInputChange = event => {
@@ -81,6 +93,7 @@ const BookItem = props => {
     return (
     <>
     {shouldRedirect ? <Redirect to={`/`} noThrow /> : null}
+    {userRoleContent || adminRoleContent ? (
       <div>
           <div className="content">
             <h2>Book</h2>
@@ -117,12 +130,12 @@ const BookItem = props => {
               </div>
 
             </form>
-
+            {adminRoleContent ? (
             <button
               className="button" type="delete"
               onClick={deleteBook} >
               Delete
-            </button>
+            </button>) : null }
                         <button
                           className="button"
                           onClick={updateBook}
@@ -156,7 +169,8 @@ const BookItem = props => {
                     </table>
                 )}
       </div>
-    </div>
+    </div> ) : (<Redirect to="/error" /> )
+    }
     </>
     );
 }

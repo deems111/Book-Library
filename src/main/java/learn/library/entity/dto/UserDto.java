@@ -7,11 +7,11 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 @Builder
-public class BookDto {
+public class UserDto {
 
-    private String id;
-    private String authors;
-    private String title;
-    private String genre;
+private String id;
+        private String authors;
+        private String title;
+        private String genre;
 
 }

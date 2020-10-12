@@ -1,11 +1,9 @@
-package FillData;
+package fillData;
 
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
 import learn.library.entity.Book;
-import learn.library.entity.Comment;
 import learn.library.repository.interfaces.BookRepository;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.ArrayList;
 import java.util.List;

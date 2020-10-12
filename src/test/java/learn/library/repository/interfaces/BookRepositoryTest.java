@@ -1,5 +1,6 @@
 package learn.library.repository.interfaces;
 
+import configuration.Config;
 import com.github.cloudyrock.mongock.SpringMongock;
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DataMongoTest
-@Import(Configuration.Config.class)
+@Import(Config.class)
 public class BookRepositoryTest {
 
     @Autowired
@@ -30,8 +31,6 @@ public class BookRepositoryTest {
     private static final String TEST_AUTHOR = "Test_author_name_surname";
     private static final String TEST_GENRE_NAME = "Test genre name";
     private static final String TEST_BOOK_TITLE = "Test book title";
-    private static final String TEST_ID = "TEST_ID";
-
 
     @BeforeEach
     void init() {
@@ -42,7 +41,7 @@ public class BookRepositoryTest {
     public void addBook() {
 
         int count = mongoTemplate.findAll(Book.class).size();
-        bookRepository.save(createBook()).block();
+        bookRepository.save(createBook());
 
         Assert.isTrue(mongoTemplate.findAll(Book.class).size() == count + 1, "Get books <> 1");
         Query query = new Query();
@@ -56,11 +55,10 @@ public class BookRepositoryTest {
     @Test
     public void deleteBook() {
 
-        Book book = createBook();
-        bookRepository.save(createBook()).block();
+        Book book = mongoTemplate.save(createBook());
 
         int sizeBeforeDelete = mongoTemplate.findAll(Book.class).size();
-        bookRepository.deleteById(book.getId()).block();
+        bookRepository.deleteById(book.getId());
         int sizeAfterDelete = mongoTemplate.findAll(Book.class).size();
 
         Assert.isTrue(sizeBeforeDelete - sizeAfterDelete == 1, "Size difference is not 1");
@@ -72,10 +70,24 @@ public class BookRepositoryTest {
         Assert.isTrue(mongoTemplate.find(query, Comment.class).size() == 0, "Get book by title is not null");
     }
 
+    @Test
+    public void getBookByAuthorTest() throws Exception {
+
+        Book book = mongoTemplate.save(createBook());
+
+        List<Book> books = mongoTemplate.findAll(Book.class);
+
+        Assert.isTrue(bookRepository.findByAuthors(TEST_AUTHOR).size() == 1, "Get books size is not 1");
+        Assert.isTrue(bookRepository.findByAuthors(TEST_AUTHOR).get(0)
+                .getAuthors().iterator().next().equalsIgnoreCase(TEST_AUTHOR), "Get books size is not 1");
+    }
+
     private Book createBook() {
         List<String> authors = new ArrayList<>();
         authors.add(TEST_AUTHOR);
-        return new Book(TEST_ID, TEST_BOOK_TITLE, TEST_GENRE_NAME, authors);
+        Book book = new Book(TEST_BOOK_TITLE, TEST_GENRE_NAME, authors);
+
+        return book;
     }
 
 }

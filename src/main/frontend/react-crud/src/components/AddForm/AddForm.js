@@ -1,6 +1,8 @@
-import React, { useState }  from "react";
-import {  Redirect } from "react-router-dom";
+import React, { useState, useEffect }  from "react";
+import { Link, Redirect } from "react-router-dom";
+
 import BookService from "../../services/BookService";
+import AuthorizationService from "../../services/AuthorizationService";
 
 const AddForm = () => {
   const init = {
@@ -10,13 +12,25 @@ const AddForm = () => {
     authors: "Enter Author(s)"
   };
 
+    const [userRoleContent, setUserRoleContent] = useState(false);
+    const [currentUser, setCurrentUser] = useState(undefined);
+
+    useEffect(() => {
+      const user = AuthorizationService.getCurrentUser();
+
+      if (user) {
+        setCurrentUser(user);
+        userRoleContent(user.roles.includes("ROLE_USER"));
+      }
+    }, []);
+
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [book, setBook] = useState(init);
 
   const newBook = () => {
-    setBook(init);
-    setShouldRedirect(false);
-    };
+     setBook(init);
+     setShouldRedirect(false);
+  };
 
   const handleInputChange = event => {
     const { name, value } = event.target;
@@ -49,7 +63,8 @@ const AddForm = () => {
 
   return  (
   <>
-       {shouldRedirect ? <Redirect to={`/`} noThrow /> : null}
+       {shouldRedirect ? <Redirect to={`/`} noThrow /> : null},
+       {userRoleContent ? (
        <div>
            <div>
              <h4>Add Book</h4>
@@ -93,7 +108,8 @@ const AddForm = () => {
                Add Book
              </button>
            </div>
-       </div>
+       </div>) : (<Redirect to="/error" /> )
+       }
       </>
    );
 }
