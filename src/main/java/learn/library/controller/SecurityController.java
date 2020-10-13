@@ -3,19 +3,17 @@ package learn.library.controller;
 import learn.library.entity.Role;
 import learn.library.entity.User;
 import learn.library.entity.enums.ERole;
-import learn.library.repository.interfaces.RoleRepository;
 import learn.library.security.AuthenticationHelper;
 import learn.library.security.UserDetailsImpl;
-import learn.library.security.UserDetailsServiceImpl;
 import learn.library.security.jwt.login.jwt.TokenResponse;
 import learn.library.security.jwt.login.request.AuthenticationRequest;
-import learn.library.security.jwt.login.response.AuthenticationResponse;
 import learn.library.security.jwt.login.response.SimpleResponse;
 import learn.library.security.jwt.util.TokenUtil;
-import learn.library.service.interfaces.Library;
+import learn.library.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,16 +29,16 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*")
 public class SecurityController {
 
-    private final UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsService userDetailsService;
     private final TokenUtil tokenUtil;
     private final AuthenticationHelper authenticationHelper;
     private final PasswordEncoder encode;
-    private final Library libraryService;
+    private final UserService userService;
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest)
             throws SecurityException {
-        authenticationHelper.makeAuthentication(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        authenticationHelper.authenticateUser(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
         final UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String token = tokenUtil.generateToken(userDetails.getUsername());
@@ -59,20 +57,20 @@ public class SecurityController {
         String requestRoles = authenticationRequest.getRole();
         Set<Role> roles = new HashSet<>();
         if (requestRoles == null || requestRoles.isEmpty()) {
-            roles.add(libraryService.getRoleByName(ERole.ROLE_USER));
+            roles.add(userService.getRoleByName(ERole.ROLE_USER));
         } else {
             if (requestRoles.equalsIgnoreCase("admin")) {
-                roles.add(libraryService.getRoleByName(ERole.ROLE_ADMIN));
+                roles.add(userService.getRoleByName(ERole.ROLE_ADMIN));
             } else if (requestRoles.equalsIgnoreCase("user")) {
-                roles.add(libraryService.getRoleByName(ERole.ROLE_USER));
+                roles.add(userService.getRoleByName(ERole.ROLE_USER));
             } else {
-                roles.add(libraryService.getRoleByName(ERole.ROLE_ADMIN));
-                roles.add(libraryService.getRoleByName(ERole.ROLE_USER));
+                roles.add(userService.getRoleByName(ERole.ROLE_ADMIN));
+                roles.add(userService.getRoleByName(ERole.ROLE_USER));
             }
 
         }
 
-        libraryService.addUser(new User(authenticationRequest.getUsername(), encode.encode(authenticationRequest.getPassword()),
+        userService.addUser(new User(authenticationRequest.getUsername(), encode.encode(authenticationRequest.getPassword()),
                 roles));
 
         return ResponseEntity.ok(new SimpleResponse("Success"));

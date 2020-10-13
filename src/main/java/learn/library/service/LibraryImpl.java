@@ -2,13 +2,8 @@ package learn.library.service;
 
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
-import learn.library.entity.Role;
-import learn.library.entity.User;
-import learn.library.entity.enums.ERole;
 import learn.library.repository.interfaces.BookRepository;
 import learn.library.repository.interfaces.CommentRepository;
-import learn.library.repository.interfaces.RoleRepository;
-import learn.library.repository.interfaces.UserRepository;
 import learn.library.service.interfaces.Library;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,8 +18,6 @@ public class LibraryImpl implements Library {
 
     private final BookRepository bookRepository;
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -82,21 +75,6 @@ public class LibraryImpl implements Library {
     public Book updateBook(Book book) {
         bookRepository.delete(book);
         return bookRepository.save(book);
-    }
-
-    @Override
-    public User addUser(User user) {
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User getUserByName(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-    @Override
-    public Role getRoleByName(ERole eRole) {
-        return roleRepository.findByName(eRole);
     }
 
 }

@@ -2,11 +2,13 @@ package learn.library.security.jwt.filter;
 
 import learn.library.security.UserDetailsServiceImpl;
 import learn.library.security.jwt.util.TokenUtil;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -20,13 +22,11 @@ import java.io.IOException;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
-    private TokenUtil tokenUtil;
+    private final UserDetailsService userDetailsService;
+    private final TokenUtil tokenUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

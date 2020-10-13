@@ -3,6 +3,7 @@ import { Link, Redirect } from "react-router-dom";
 
 import BookService from "../../services/BookService";
 import AuthorizationService from "../../services/AuthorizationService";
+import Error from "../Error/Error";
 
 const AddForm = () => {
   const init = {
@@ -20,7 +21,7 @@ const AddForm = () => {
 
       if (user) {
         setCurrentUser(user);
-        userRoleContent(user.roles.includes("ROLE_USER"));
+        setUserRoleContent(user.roles.includes("ROLE_USER"));
       }
     }, []);
 
@@ -108,7 +109,7 @@ const AddForm = () => {
                Add Book
              </button>
            </div>
-       </div>) : (<Redirect to="/error" /> )
+       </div>) : (<Error />)
        }
       </>
    );

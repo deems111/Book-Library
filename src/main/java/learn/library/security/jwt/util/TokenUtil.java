@@ -2,13 +2,12 @@ package learn.library.security.jwt.util;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.Date;
 
-@Component
-public class TokenUtil implements Serializable {
+@Service
+public class TokenUtil {
 
     private static final long serialVersionUID = 666L;
     private static final long TOKEN_VALIDITY = 180000;

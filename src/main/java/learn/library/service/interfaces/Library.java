@@ -26,12 +26,6 @@ public interface Library {
     List<Comment> getCommentsByBookId(String bookId);
 
     Book updateBook(Book book);
-
-    User addUser(User user);
-
-    User getUserByName(String name);
-
-    Role getRoleByName(ERole eRole);
 }
 
 

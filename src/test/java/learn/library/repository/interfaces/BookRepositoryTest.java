@@ -5,6 +5,7 @@ import com.github.cloudyrock.mongock.SpringMongock;
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -38,6 +39,7 @@ public class BookRepositoryTest {
     }
 
     @Test
+    @Order(1)
     public void addBook() {
 
         int count = mongoTemplate.findAll(Book.class).size();
@@ -53,6 +55,7 @@ public class BookRepositoryTest {
     }
 
     @Test
+    @Order(3)
     public void deleteBook() {
 
         Book book = mongoTemplate.save(createBook());
@@ -71,9 +74,9 @@ public class BookRepositoryTest {
     }
 
     @Test
+    @Order(2)
     public void getBookByAuthorTest() throws Exception {
 
-        Book book = mongoTemplate.save(createBook());
 
         List<Book> books = mongoTemplate.findAll(Book.class);
 

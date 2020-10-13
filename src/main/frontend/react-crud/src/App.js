@@ -13,21 +13,8 @@ import AuthorizationService from "./services/AuthorizationService";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from './static/style/style.css'
 
-const App = () => {
-  const [authorizedContent, setAuthorizedContent] = useState(false);
-  const [adminContent, setAdminContent] = useState(false);
-  const [currentUser, setCurrentUser] = useState(undefined);
-
-  useEffect(() => {
-    const user = AuthorizationService.getCurrentUser();
-
-    if (user) {
-      setCurrentUser(user);
-      setAuthorizedContent(user.roles.includes("ROLE_USER"));
-      setAdminContent(user.roles.includes("ROLE_ADMIN"));
-    }
-  }, []);
-
+class App extends Component {
+    render() {
     return (
       <Router>
         <div>
@@ -38,11 +25,12 @@ const App = () => {
               <Route path="/login" component={LoginForm} />
               <Route path="/register" component={RegForm} />
               <Route path="/error" component={Error} />
+              <Route component={Error} />
             </Switch>
         </div>
       </Router>
     );
   }
-
+}
 
 export default App;

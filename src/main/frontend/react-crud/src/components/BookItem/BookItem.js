@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, Redirect } from "react-router-dom";
+
 import BookService from "../../services/BookService";
 import AuthorizationService from "../../services/AuthorizationService";
+import Error from "../Error/Error";
 
 const BookItem = props => {
   const initState = {
@@ -169,7 +171,7 @@ const BookItem = props => {
                     </table>
                 )}
       </div>
-    </div> ) : (<Redirect to="/error" /> )
+    </div> ) : (<Error />)
     }
     </>
     );
