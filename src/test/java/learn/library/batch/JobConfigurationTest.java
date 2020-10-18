@@ -57,16 +57,15 @@ public class JobConfigurationTest {
     @Test
     public void testLaunchJobResult() throws Exception {
         bookRepository.deleteAll();
-        assertThat(bookRepository.findAll().size(), is(0));
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParameters());
-        assertEquals(bookRepository.findAll().size(), 6);
+        assertThat(bookRepository.findByTitleRegex("test").size(), is(0));
+        jobLauncherTestUtils.launchJob(new JobParameters());
         assertThat(bookRepository.findById("1").isPresent(), is(true));
         assertThat(bookRepository.findById("2").isPresent(), is(true));
         assertThat(bookRepository.findById("3").isPresent(), is(true));
         assertThat(bookRepository.findByTitle("test First book title").size(), is(1));
         assertThat(bookRepository.findByTitle("test Second book title").size(), is(1));
         assertThat(bookRepository.findByTitle("test Third book title").size(), is(1));
-        Assert.assertNull(bookRepository.findById("4").get());
+        assertThat(bookRepository.findByTitleRegex("test").size(), is(3));
     }
 
     private List<BookSqlDb> getBooks() {
