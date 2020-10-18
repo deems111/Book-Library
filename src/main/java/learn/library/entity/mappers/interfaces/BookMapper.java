@@ -2,9 +2,13 @@ package learn.library.entity.mappers.interfaces;
 
 import learn.library.entity.Book;
 import learn.library.entity.dto.BookDto;
+import learn.library.entity.splDbEntity.AuthorSqlDb;
+import learn.library.entity.splDbEntity.BookSqlDb;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public interface BookMapper {
@@ -24,6 +28,18 @@ public interface BookMapper {
                 .genre(bookDto.getGenre())
                 .authors(convertAuthorsArrayToList(bookDto.getAuthors()))
                 .build();
+    }
+
+    default Book toMongoEntity(BookSqlDb bookSqlDb) {
+        return Book.builder().id(String.valueOf(bookSqlDb.getId()))
+                .authors(bookSqlDb.getAuthors().stream().map(this::authorToMongoEntity).collect(Collectors.toList()))
+                .genre(bookSqlDb.getGenre().getName())
+                .title(bookSqlDb.getTitle())
+                .build();
+    }
+
+    default String authorToMongoEntity(AuthorSqlDb authorSqlDb) {
+        return authorSqlDb.getName() + " , " + authorSqlDb.getSurname();
     }
 
     /**

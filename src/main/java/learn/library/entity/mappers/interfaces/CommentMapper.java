@@ -2,6 +2,7 @@ package learn.library.entity.mappers.interfaces;
 
 import learn.library.entity.Comment;
 import learn.library.entity.dto.CommentDto;
+import learn.library.entity.splDbEntity.CommentSqlDb;
 
 public interface CommentMapper {
     default CommentDto toDto(Comment comment) {
@@ -19,4 +20,6 @@ public interface CommentMapper {
                 .subject(commentDto.getSubject())
                 .build();
     }
+
+    Comment toMongoEntity(CommentSqlDb commentSqlDb);
 }

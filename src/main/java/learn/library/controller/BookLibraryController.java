@@ -2,8 +2,6 @@ package learn.library.controller;
 
 import learn.library.entity.Book;
 import learn.library.entity.dto.BookDto;
-import learn.library.entity.mappers.BookMapperImpl;
-import learn.library.entity.mappers.CommentMapperImpl;
 import learn.library.entity.mappers.interfaces.BookMapper;
 import learn.library.entity.mappers.interfaces.CommentMapper;
 import learn.library.service.interfaces.Library;
@@ -20,8 +18,8 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*")
 public class BookLibraryController {
 
-    private final BookMapper bookMapper = new BookMapperImpl();
-    private final CommentMapper commentMapper = new CommentMapperImpl();
+    private final BookMapper bookMapper;
+    private final CommentMapper commentMapper;
     private final Library libraryService;
 
     @GetMapping("/books")

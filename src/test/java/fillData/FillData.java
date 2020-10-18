@@ -11,7 +11,7 @@ import java.util.List;
 @ChangeLog(order = "1")
 public class FillData {
 
-    @ChangeSet(author = "", id = "initMongo", order ="1" )
+/*    @ChangeSet(author = "", id = "initMongo", order ="1" )
     public void init(BookRepository bookRepository) {
         List<String> authors = new ArrayList<>();
         authors.add("AuthorName Surname1");
@@ -23,6 +23,6 @@ public class FillData {
         authors.add("AuthorName3 Surname1");
         bookRepository.save(new Book("Mongo Test Book 3", "Mongo Test Genre 2", authors));
 
-    }
+    }*/
 
 }
