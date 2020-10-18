@@ -2,7 +2,6 @@ package learn.library.repository.interfaces;
 
 import learn.library.entity.Book;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 
