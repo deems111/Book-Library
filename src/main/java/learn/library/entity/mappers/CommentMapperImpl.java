@@ -7,8 +7,6 @@ import learn.library.entity.splDbEntity.CommentSqlDb;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.awt.print.Book;
-
 @Component
 @AllArgsConstructor
 public class CommentMapperImpl implements CommentMapper {
