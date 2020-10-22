@@ -8,6 +8,6 @@ import org.springframework.integration.annotation.MessagingGateway;
 public interface BookIntegrationGateway {
 
     @Gateway(requestChannel = "inputChannel")
-    public Book process(Object o);
+    Book process(Object o);
 
 }

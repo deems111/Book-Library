@@ -21,6 +21,8 @@ public class IntegrationConfig {
     private final BookMapper bookMapper;
     private final LibraryImpl libraryImpl;
 
+    private final static String SERVICE_NAME = "anotherService";
+
     @Bean
     public MessageChannel inputChannel() {
         return MessageChannels.direct().get();
@@ -50,7 +52,7 @@ public class IntegrationConfig {
     public IntegrationFlow saveBookFlow() {
         return IntegrationFlows.from("inputChannel")
                 .log("inputChannel - enter")
-                .handle("anotherService", "doSomething")
+                .handle(SERVICE_NAME, "doSomething")
                 .<Object, Object>route(this::route,
                         mapping -> mapping
                                 .channelMapping(true, "saveChannel")
