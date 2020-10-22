@@ -6,7 +6,7 @@ spring:
       host: localhost
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/postgres
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: root
     initialization-mode: always
@@ -16,6 +16,15 @@ spring:
       enabled: false
     initialize-schema: always
 
-  logging:
-    level:
-      root: info
+logging:
+  level:
+    root: info
+  pattern:
+    file: '%d{yyyy-MM-dd HH:mm:ss}%t %-5level : %t %msg%n'
+  file: 'applog/app.log'
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
