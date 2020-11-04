@@ -2,6 +2,7 @@ package learn.library.model;
 
 import learn.library.integration.BookIntegrationGateway;
 import learn.library.integration.service.BookIntegrationService;
+import learn.library.service.interfaces.Library;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -23,6 +24,18 @@ public class ShellModel {
 
     private final BookIntegrationGateway bookIntegrationGateway;
     private final BookIntegrationService bookIntegrationService;
+
+    private final Library libraryService;
+
+    @ShellMethod(value = "Get Books From Library", key = "get")
+    public void getBooks() {
+        try {
+            System.out.println(libraryService.getBooks().size());
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+        }
+    }
 
     @ShellMethod(value = "Migrate Data From Sql Database to Mongo", key = "fillBooks")
     public String getAllBooks() {

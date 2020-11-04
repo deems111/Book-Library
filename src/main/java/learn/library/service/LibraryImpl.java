@@ -1,17 +1,21 @@
 package learn.library.service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import learn.library.entity.Book;
 import learn.library.entity.Comment;
 import learn.library.repository.interfaces.BookRepository;
 import learn.library.repository.interfaces.CommentRepository;
 import learn.library.service.interfaces.Library;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class LibraryImpl implements Library {
@@ -21,8 +25,17 @@ public class LibraryImpl implements Library {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Book> getBooks() {
+    @HystrixCommand(groupKey = "getAllBooksGroup", commandKey = "getAllBooksCommand", fallbackMethod = "getAllBooksFallback")
+    public List<Book> getBooks() throws Exception {
+        if (Math.round(Math.random()) == 0) {
+            log.info("Hystrix FallBack");
+            throw new Exception("Hystrix FallBack Exception");
+        }
         return bookRepository.findAll();
+    }
+
+    public List<Book> getAllBooksFallback() {
+        return new ArrayList<>();
     }
 
     @Override

@@ -31,3 +31,4 @@ management:
           - metrics
           - health
           - logfile
+          - hystrix.stream

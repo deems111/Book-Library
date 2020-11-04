@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface Library {
 
-    List<Book> getBooks();
+    List<Book> getBooks() throws Exception;
 
     Book getBooksById(String id);
 

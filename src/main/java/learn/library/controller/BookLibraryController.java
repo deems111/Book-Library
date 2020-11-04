@@ -30,6 +30,8 @@ public class BookLibraryController {
                     libraryService.getBooks().stream().map(bookMapper::toDto).collect(Collectors.toList()), HttpStatus.OK);
         } catch (NullPointerException e) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 
