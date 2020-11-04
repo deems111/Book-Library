@@ -27,4 +27,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include:
+          - metrics
+          - health
+          - logfile
