@@ -9,13 +9,16 @@ RUN mvn clean -B
 RUN mvn dependency:resolve-plugins -B
 RUN mvn dependency:resolve -B
 
-ADD ./ /docker
+ADD ./ /docker/
 
 RUN mvn install -B -DskipTests
 
 FROM openjdk:11-jre-slim
-COPY library.jar /docker/library.jar
+
+RUN mkdir -p /docker
+WORKDIR /docker
+COPY --from=0 /docker/target/library.jar /docker/
 
 EXPOSE 8080
-CMD ["java", "-jar", "library.jar"]
+CMD ["java", "-jar", "/docker/library.jar"]
 
