@@ -6,6 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>library</artifactId>
+    <version>1</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

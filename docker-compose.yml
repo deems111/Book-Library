@@ -2,6 +2,8 @@ version: "3"
 
 services:
   application:
+    network_mode: host
+    stdin_open: true   # -i docker
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,9 +13,26 @@ services:
       - 8080:8080
     depends_on:
       - mongodb
+      - postgresdb
 
   mongodb:
     image: mongo:latest
-    container_name: "mongodb"
+    restart: always
+    container_name: mongodb-gh
+    volumes:
+      #    - ./mongod.conf:/etc/mongod.conf
+      - ./db:/var/lib/mongodb
+    #  command: mongod --config /etc/mongod.conf
     ports:
       - 27017:27017
+
+  postgresdb:
+    image: postgres:latest
+    restart: always
+    container_name: postgres
+    env_file:
+      - postgres.env
+    volumes:
+      - ./db:/var/lib/postgres
+    ports:
+      - 5432:5432
