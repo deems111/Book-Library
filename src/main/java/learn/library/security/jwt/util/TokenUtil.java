@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+/**
+ * Utility Class for Token Validity
+ */
 @Service
 public class TokenUtil {
 

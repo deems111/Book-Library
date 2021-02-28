@@ -5,6 +5,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+/**
+ * Implementation of User Details for Anonymous Users
+ */
 public class AnonymousUserDetailsImpl implements UserDetails {
 
     @Override

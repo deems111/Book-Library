@@ -6,6 +6,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Class of Token Response - Get User's Roles and User's Info
+ */
 @Getter
 @Setter
 public class TokenResponse implements Serializable {

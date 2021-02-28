@@ -1,10 +1,8 @@
 package learn.library.security.jwt.filter;
 
-import learn.library.security.UserDetailsServiceImpl;
 import learn.library.security.jwt.util.TokenUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Authorization Filter Using Token Authentication
+ */
 @Slf4j
 @Component
 @AllArgsConstructor

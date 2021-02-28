@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 
+
 @Component
 public class JwtEntryPoint implements AuthenticationEntryPoint, Serializable {
 
