@@ -1,1 +1,1 @@
-Spring Boot Application using Mongo and JWT.
+Used Spring Boot Actuator - Added Health Check For Books - SimpleHealthCheckIndicator Size
