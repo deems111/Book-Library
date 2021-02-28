@@ -17,6 +17,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Component for Spring Shell CLI-interface.
+ */
 @ShellComponent
 @Data
 public class ShellModel {
@@ -43,7 +46,7 @@ public class ShellModel {
     }
 
     /**
-     * Method return table, including of books in library with current author
+     * Method returns table, including of books in library with current author
      *
      * @param surname surname of author
      * @param name    name of author
@@ -60,7 +63,7 @@ public class ShellModel {
     }
 
     /**
-     * Method remove book from library
+     * Method removes book from library
      *
      * @param id id of book ot remove
      * @return String
